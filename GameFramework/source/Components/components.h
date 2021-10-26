@@ -498,9 +498,14 @@ inline int hash(int state)
 	return state;
 }
 
+inline double randomDouble(double min, double max)
+{
+	return (min)+((double)rand() / RAND_MAX) * (max - min);  // can change random2D().lenSqr() with rand() / RAND_MAX
+}
+
 inline vec2 random2D()
 {
-	return vec2(hash(rand()), hash(rand())).normalize();
+	return vec2(randomDouble(-1,1),randomDouble(-1,1)).normalize();//vec2(hash(rand()), hash(rand())).normalize();
 }
 
 inline vec2 signRandom2D()
@@ -525,11 +530,6 @@ inline vec4 random4D()
 inline float map(float val, float oldMin, float oldMax, float newMin, float newMax)
 {
 	return newMin + (newMax - newMin) * ((val - oldMin) / (oldMax - oldMin));
-}
-
-inline double randomDouble(double min, double max)
-{
-	return (min) + ((double) rand() / RAND_MAX) * (max - min);  // can change random2D().lenSqr() with rand() / RAND_MAX
 }
 
 inline double constrain(double val, double min, double max)
