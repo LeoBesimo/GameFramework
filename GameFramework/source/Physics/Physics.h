@@ -86,10 +86,18 @@ inline void renderPhysicsObject(sf::RenderWindow& target,PhysicsBody* body, sf::
 		sf::RectangleShape rect;
 		rect.setPosition(body->aabb.min.x, body->aabb.min.y);
 		vec2 dim = body->aabb.max - body->aabb.min;
-		std::cout << dim << "\n";
+		//std::cout << dim << "\n";
 		rect.setSize(sf::Vector2f(dim.x,dim.y));
 		rect.setFillColor(fillColor);
 		target.draw(rect);
+
+		sf::CircleShape edgePoint;
+		edgePoint.setRadius(5);
+		edgePoint.setPosition(body->aabb.min.x-2.5, body->aabb.min.y-2.5);
+		edgePoint.setFillColor(sf::Color::Green);
+		target.draw(edgePoint);
+		edgePoint.setPosition(body->aabb.max.x-2.5, body->aabb.max.y-2.5);
+		target.draw(edgePoint);
 	break;
 	}
 

@@ -149,7 +149,6 @@ struct vec2
 			y *= limit;
 		}
 	}
-
 };
 
 struct vec3
@@ -527,6 +526,36 @@ inline vec4 random4D()
 	return vec4(hash(rand()), hash(rand()), hash(rand()), hash(rand())).normalize();
 }
 
+inline double min(double a, double b)
+{
+	return a < b ? a : b;
+}
+
+inline double max(double a, double b)
+{
+	return a > b ? a : b;
+}
+
+inline vec2 minVec2(vec2 a, vec2 b)
+{
+	return vec2(min(a.x, b.x), min(a.y, b.y));
+}
+
+inline vec2 maxVec2(vec2 a, vec2 b)
+{
+	return vec2(max(a.x, b.x), max(a.y, b.y));
+}
+
+inline vec2 clampVec2(vec2 a, vec2 min, vec2 max)
+{
+	return maxVec2(min, minVec2(a, max));
+}
+
+inline vec2 absVec2(vec2 a)
+{
+	return vec2(a.x < 0 ? -a.x : a.x, a.y < 0 ? -a.y : a.y);
+}
+
 inline float map(float val, float oldMin, float oldMax, float newMin, float newMax)
 {
 	return newMin + (newMax - newMin) * ((val - oldMin) / (oldMax - oldMin));
@@ -549,7 +578,7 @@ inline vec2 constrainVec2(vec2 vec, vertex limit)
 	return constrainVec2(vec, limit.p1, limit.p2);
 }
 
-inline double dotProduct(vec2 a, vec2 b)
+inline double dotVec2(vec2 a, vec2 b)
 {
 	return a.x* b.x + a.y * b.y;
 }

@@ -38,20 +38,35 @@ bool create(int screenWidth, int screenHeight) {
 
 	windowSize = vec2(screenWidth, screenHeight);
 
-	for (unsigned int i = 0; i < 1; i++) {
+	for (unsigned int i = 0; i < 20; i++) {
 		bodies.push_back(new PhysicsBody());
-		vec2 pos = signRandom2D() * randomDouble(0,screenWidth);
-		vec2 dim = signRandom2D() * randomDouble(30, 60);
+
+		vec2 pos = signRandom2D() * randomDouble(0, screenWidth);
+
 		vec2 vel = random2D() * 80;
 		float mass = 50 + rand() % 50;
 
-		std::cout << i << " " << pos << " " << dim << " " << vel << " " << mass << "\n";
+		if(true){
+		
+
+		vec2 dim = vec2(randomDouble(60, 80), randomDouble(60, 80));
+
+		//std::cout << i << " " << pos << " " << dim << " " << vel << " " << mass << "\n";
 
 		//CreateCircle(bodies[i], pos, r, vel, mass, 1);
 		CreateAABB(bodies[i], pos, dim, vel, mass, 1);
+		}
+		else
+		{
+			float r = randomDouble(20, 40);
+			CreateCircle(bodies[i], pos, r, vel, mass, 1);
+		}
 		bodies[i]->color = random4D() * 255; //vec4(255, 0, 255, 0);//random4D() * 255;
 		bodies[i]->color.w = 255;
 	}
+
+	//bodies.push_back(new PhysicsBody());
+	//CreateAABB(bodies[1], vec2(0,0), vec2(40,40), vec2(0,0), 50, 1);
 
 	for (unsigned int i = 0; i < 20; i++) 
 	{
@@ -101,6 +116,7 @@ void run()
 
 		if (mousePressed)
 		{
+			/*
 			unsigned int size = bodies.size();
 			for (int i = size-1; i < size-1 + 20; i++) {
 				//delete bodies[i];
@@ -115,7 +131,14 @@ void run()
 
 				CreateCircle(bodies[i], pos, r, vel, mass, 1);
 				bodies[i]->color = random4D() * 255;//vec4(255, 0, 255, 0);
-			}
+			}*/
+
+			bodies.push_back(new PhysicsBody());
+			float r = 20 + rand() % 20;
+			vec2 vel = random2D() * 80;
+			float mass = 50 + rand() % 50;
+
+			CreateCircle(bodies[bodies.size() - 1], mousePos, r, vel, mass, 1);
 			mousePressed = false;
 		}
 
@@ -135,6 +158,11 @@ void run()
 		constrainPhysicsObject(mouseCircle, vec2(0, 0), windowSize);
 
 		*/
+
+		//vec2 dim = bodies[1]->aabb.max - bodies[1]->aabb.min;
+		//bodies[1]->aabb.min = mousePos;
+		//bodies[1]->aabb.max = mousePos + dim;
+
 		//mouseCircle->circle.pos = mousePos;
 		//shape.setPosition(sf::Vector2f(body->circle.pos.x - body->circle.radius, body->circle.pos.y - body->circle.radius));
 		//circle.setPosition(mouseCircle->circle.pos.x - body->circle.radius, mouseCircle->circle.pos.y - body->circle.radius);
@@ -146,24 +174,24 @@ void run()
 
 		//TODO: Extend physics rendering system
 		//TODO: Complete PhyscisBody constraining mechanism
-		//TODO: Find bug in Collision Detection that causes Balls to collide with nothing
 
 		double totalVel = 0;
 
 		for(unsigned int i = 0; i < bodies.size(); i++){
 			updatePhysicsBody(bodies[i], deltaTime);
-
 			bounceInArea(bodies[i], { 0,0 }, windowSize);
 			constrainPhysicsObject(bodies[i], { 0,0 }, windowSize);
-			Manifold m;
+			bodies[i]->color = vec4(255, 0, 0, 255);
+			//Manifold m;
 			//bodies[i]->color = vec4(255, 0, 255, 0);
-			m.a = *bodies[i];
+			//m.a = *bodies[i];
 			totalVel += bodies[i]->velocity.len();
 			for(unsigned int j = 0; j < bodies.size(); j++){
-				m.b = *bodies[j];
+				//m.b = *bodies[j];
 				if(i != j)
-				{
-					m = AABBvsAABB(m);
+				{	
+					Manifold m = collide(bodies[i], bodies[j]);
+					//m = AABBvsAABB(m);
 					//m = CirclevsCircle(m);
 					if(m.collision)
 					{
@@ -172,8 +200,9 @@ void run()
 					c /= 2;
 					//c.limit(255^4);
 					c.w = 255;
-					bodies[i]->color = c;//vec4(255, 255, 0, 0);
-					bodies[j]->color = c;// vec4(255, 255, 0, 0);
+					//bodies[i]->color = c;//vec4(255, 255, 0, 0);
+					//bodies[j]->color = c;// vec4(255, 255, 0, 0);
+					bodies[i]->color = vec4(255, 0, 255, 0);
 					}
 				}
 			}
