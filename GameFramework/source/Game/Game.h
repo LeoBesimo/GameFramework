@@ -48,8 +48,8 @@ bool create(int screenWidth, int screenHeight) {
 		std::cout << i << " " << pos << " " << r << " " << vel << " " << mass << "\n";
 
 		CreateCircle(bodies[i], pos, r, vel, mass, 1);
-		bodies[i]->color = vec4(255, 0, 255, 0);//random4D() * 255;
-		//bodies[i]->color.w = 255;
+		bodies[i]->color = random4D() * 255; //vec4(255, 0, 255, 0);//random4D() * 255;
+		bodies[i]->color.w = 255;
 	}
 
 	for (unsigned int i = 0; i < 20; i++) 
@@ -101,18 +101,19 @@ void run()
 		if (mousePressed)
 		{
 			unsigned int size = bodies.size();
-			for (int i = 0; i < size; i++) {
-				delete bodies[i];
-				bodies[i] = new PhysicsBody();
+			for (int i = size-1; i < size-1 + 20; i++) {
+				//delete bodies[i];
+				//bodies[i] = new PhysicsBody();
+				bodies.push_back(new PhysicsBody());
 				vec2 pos = signRandom2D() * randomDouble(0, windowSize.x);
 				float r = 20 + rand() % 20;
 				vec2 vel = random2D() * 80;
 				float mass = 50 + rand() % 50;
 
-				std::cout << i << " " << pos << " " << r << " " << vel << " " << mass << "\n";
+				//std::cout << i << " " << pos << " " << r << " " << vel << " " << mass << "\n";
 
 				CreateCircle(bodies[i], pos, r, vel, mass, 1);
-				bodies[i]->color = vec4(255, 0, 255, 0);
+				bodies[i]->color = random4D() * 255;//vec4(255, 0, 255, 0);
 			}
 			mousePressed = false;
 		}
@@ -156,6 +157,7 @@ void run()
 
 			constrainPhysicsObject(bodies[i], { 0,0 }, windowSize);
 			Manifold m;
+			//bodies[i]->color = vec4(255, 0, 255, 0);
 			m.a = *bodies[i];
 			totalVel += bodies[i]->velocity.len();
 			for(unsigned int j = 0; j < bodies.size(); j++){
@@ -163,8 +165,16 @@ void run()
 				if(i != j)
 				{
 					m = CirclevsCircle(m);
+					if(m.collision)
+					{
 					ResolveCollision(m, bodies[i], bodies[j]);
-			
+					vec4 c = bodies[i]->color + bodies[j]->color;//random4D() * 255;
+					c /= 2;
+					//c.limit(255^4);
+					c.w = 255;
+					bodies[i]->color = c;//vec4(255, 255, 0, 0);
+					bodies[j]->color = c;// vec4(255, 255, 0, 0);
+					}
 				}
 			}
 		}
@@ -181,7 +191,7 @@ void run()
 		//shape.setRadius(body->circle.radius);
 		//circle.setRadius(mouseCircle->circle.radius);
 
-		window->clear();
+		window->clear(sf::Color::White);
 		
 		for (unsigned int i = 0; i < bodies.size(); i++) {
 			renderPhysicsObject(*window, bodies[i]);
