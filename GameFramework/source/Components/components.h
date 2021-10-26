@@ -537,16 +537,16 @@ inline double constrain(double val, double min, double max)
 	return val < min ? min : val > max ? max : val;
 }
 
-inline vec2 constrainvec2(vec2 vec, vec2 min, vec2 max) 
+inline vec2 constrainVec2(vec2 vec, vec2 min, vec2 max) 
 {
 	vec.x = constrain(vec.x, min.x, max.x);
 	vec.y = constrain(vec.y, min.y, max.y);
 	return vec;
 }
 
-inline vec2 constrainvec2(vec2 vec, vertex limit) 
+inline vec2 constrainVec2(vec2 vec, vertex limit) 
 {
-	return constrainvec2(vec, limit.p1, limit.p2);
+	return constrainVec2(vec, limit.p1, limit.p2);
 }
 
 inline double dotProduct(vec2 a, vec2 b)

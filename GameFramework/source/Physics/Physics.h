@@ -39,19 +39,39 @@ inline void constrainPhysicsObject(PhysicsBody* body, vec2 min, vec2 max)
 	switch (body->type) 
 	{
 	case BodyType::AABB:
-		body->aabb.min.x = constrain(body->aabb.min.x, min.x, max.x - body->aabb.max.x - body->aabb.min.x);
-		body->aabb.min.y = constrain(body->aabb.min.y, min.y, max.y - body->aabb.max.y - body->aabb.min.y);
-		body->aabb.max.x = constrain(body->aabb.max.x, min.x + body->aabb.max.x - body->aabb.min.x, max.x);
-		body->aabb.max.y = constrain(body->aabb.max.y, min.y + body->aabb.max.y - body->aabb.min.y, max.y);
+	{
+		vec2 dim = body->aabb.max - body->aabb.min;
+		body->aabb.min = constrainVec2(body->aabb.min, min, max - dim);
+		body->aabb.max = constrainVec2(body->aabb.max, min + dim, max);
 		break;
-
+	}
 	case BodyType::Circle:
-		body->circle.pos = constrainvec2(body->circle.pos, min + body->circle.radius, max - body->circle.radius);
+		body->circle.pos = constrainVec2(body->circle.pos, min + body->circle.radius, max - body->circle.radius);
 		break;
 
 	case BodyType::Polygon:
 
 	case BodyType::Null:
+		break;
+	}
+}
+
+inline void bounceInArea(PhysicsBody* body, vec2 min, vec2 max)
+{
+	switch (body->type)
+	{
+	case BodyType::AABB:
+	{
+		vec2 dim = body->aabb.max - body->aabb.min;
+		if (body->aabb.min.x > max.x - dim.x || body->aabb.max.x < min.x + dim.x) body->velocity.x *= -1;
+		if (body->aabb.min.y > max.y - dim.y || body->aabb.max.y < min.y + dim.y) body->velocity.y *= -1;
+		break;
+	}
+	case BodyType::Circle:
+		if (body->circle.pos.x > max.x - body->circle.radius || body->circle.pos.x < min.x + body->circle.radius) body->velocity.x *= -1;
+		if (body->circle.pos.y > max.y - body->circle.radius || body->circle.pos.y < min.y + body->circle.radius) body->velocity.y *= -1;
+		break;
+	case BodyType::Polygon:
 		break;
 	}
 }
@@ -62,11 +82,14 @@ inline void renderPhysicsObject(sf::RenderWindow& target,PhysicsBody* body, sf::
 	switch (body->type)
 	{
 	case BodyType::AABB:
-	{sf::RectangleShape rect;
-	rect.setPosition(body->aabb.min.x, body->aabb.min.y);
-	rect.setSize(sf::Vector2f(body->aabb.max.x - body->aabb.min.x, body->aabb.max.y - body->aabb.min.y));
-	rect.setFillColor(fillColor);
-	target.draw(rect);
+	{
+		sf::RectangleShape rect;
+		rect.setPosition(body->aabb.min.x, body->aabb.min.y);
+		vec2 dim = body->aabb.max - body->aabb.min;
+		std::cout << dim << "\n";
+		rect.setSize(sf::Vector2f(dim.x,dim.y));
+		rect.setFillColor(fillColor);
+		target.draw(rect);
 	break;
 	}
 

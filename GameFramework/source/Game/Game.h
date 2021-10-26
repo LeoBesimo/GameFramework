@@ -38,16 +38,17 @@ bool create(int screenWidth, int screenHeight) {
 
 	windowSize = vec2(screenWidth, screenHeight);
 
-	for (unsigned int i = 0; i < 20; i++) {
+	for (unsigned int i = 0; i < 1; i++) {
 		bodies.push_back(new PhysicsBody());
 		vec2 pos = signRandom2D() * randomDouble(0,screenWidth);
-		float r = 20 + rand() % 20;
+		vec2 dim = signRandom2D() * randomDouble(30, 60);
 		vec2 vel = random2D() * 80;
 		float mass = 50 + rand() % 50;
 
-		std::cout << i << " " << pos << " " << r << " " << vel << " " << mass << "\n";
+		std::cout << i << " " << pos << " " << dim << " " << vel << " " << mass << "\n";
 
-		CreateCircle(bodies[i], pos, r, vel, mass, 1);
+		//CreateCircle(bodies[i], pos, r, vel, mass, 1);
+		CreateAABB(bodies[i], pos, dim, vel, mass, 1);
 		bodies[i]->color = random4D() * 255; //vec4(255, 0, 255, 0);//random4D() * 255;
 		bodies[i]->color.w = 255;
 	}
@@ -152,9 +153,7 @@ void run()
 		for(unsigned int i = 0; i < bodies.size(); i++){
 			updatePhysicsBody(bodies[i], deltaTime);
 
-			if (bodies[i]->circle.pos.x > windowSize.x - bodies[i]->circle.radius || bodies[i]->circle.pos.x < bodies[i]->circle.radius) bodies[i]->velocity.x *= -1;
-			if (bodies[i]->circle.pos.y > windowSize.y - bodies[i]->circle.radius || bodies[i]->circle.pos.y < bodies[i]->circle.radius) bodies[i]->velocity.y *= -1;
-
+			bounceInArea(bodies[i], { 0,0 }, windowSize);
 			constrainPhysicsObject(bodies[i], { 0,0 }, windowSize);
 			Manifold m;
 			//bodies[i]->color = vec4(255, 0, 255, 0);
@@ -164,7 +163,8 @@ void run()
 				m.b = *bodies[j];
 				if(i != j)
 				{
-					m = CirclevsCircle(m);
+					m = AABBvsAABB(m);
+					//m = CirclevsCircle(m);
 					if(m.collision)
 					{
 					ResolveCollision(m, bodies[i], bodies[j]);
