@@ -196,6 +196,7 @@ void run()
 					if(m.collision)
 					{
 					ResolveCollision(m, bodies[i], bodies[j]);
+					//positionalCorrection(m, bodies[i], bodies[j]);
 					vec4 c = bodies[i]->color + bodies[j]->color;//random4D() * 255;
 					c /= 2;
 					//c.limit(255^4);

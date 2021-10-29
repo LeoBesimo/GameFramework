@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PhysicsBodies.h"
+#include "Physics.h"
 
 inline Manifold CirclevsAABB(Manifold m)
 {
@@ -202,11 +203,20 @@ void ResolveCollision(Manifold m, PhysicsBody *a, PhysicsBody *b)
 	b->velocity += impulse * (1 / b->mass);
 }
 
-void positionalCorrection(Manifold m,PhysicsBody* a, PhysicsBody* b)
+inline void positionalCorrection(Manifold m,PhysicsBody* a, PhysicsBody* b)
 {
 	const float precent = 0.2;
 	const float slop = 0.01;
-	vec2 correction = max(m.penetration - slop, 0.0f) / (1 / a->mass + 1 / b->mass);
+	vec2 correction = m.normal * (max(m.penetration - slop, 0.0f) / (1 / a->mass + 1 / b->mass));
+	vec2 pos1 = getPosition(a);
+	vec2 pos2 = getPosition(b);
+
+	pos1 -= correction * 1 / a->mass;
+	pos2 += correction * 1 / b->mass;
+
+	setPosition(a, pos1);
+	setPosition(b, pos2);
+	
 }
 
 inline Manifold collide(PhysicsBody* a, PhysicsBody* b)

@@ -4,6 +4,54 @@
 #include "BodyCreator.h"
 #include "SFML/Graphics.hpp"
 
+inline vec2 getPosition(PhysicsBody* body)
+{
+	switch (body->type)
+	{
+	case BodyType::Circle:
+		return body->circle.pos;
+	case BodyType::AABB:
+		return body->aabb.min;
+	case BodyType::Polygon:
+		/*body->velocity += body->acceleration * deltaTime;
+		body->polygon.pos += body->velocity * deltaTime;
+		for (unsigned int i = 0; i < body->polygon.points.size(); i++)
+		{
+			body->polygon.points[i] += body->velocity * deltaTime;
+		}
+		body->acceleration.set(0, 0);*/
+		return body->polygon.pos;
+	}
+
+	return vec2(0, 0);
+}
+
+inline void setPosition(PhysicsBody* body, vec2 pos)
+{
+	switch (body->type)
+	{
+	case BodyType::Circle:
+		body->circle.pos = pos;
+		break;
+	case BodyType::AABB:
+	{
+		vec2 size = body->aabb.max - body->aabb.min;
+		body->aabb.min = pos;
+		body->aabb.max = pos + size;
+		break;
+	}
+	case BodyType::Polygon:
+		/*body->velocity += body->acceleration * deltaTime;
+		body->polygon.pos += body->velocity * deltaTime;
+		for (unsigned int i = 0; i < body->polygon.points.size(); i++)
+		{
+			body->polygon.points[i] += body->velocity * deltaTime;
+		}
+		body->acceleration.set(0, 0);*/
+		break;
+	}
+}
+
 inline bool updatePhysicsBody(PhysicsBody* body, float deltaTime) 
 {
 	switch (body->type)
