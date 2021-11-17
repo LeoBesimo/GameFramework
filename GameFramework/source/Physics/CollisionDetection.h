@@ -18,7 +18,7 @@ inline Manifold CirclevsAABB(Manifold m)
 	{
 		if (d2 != 0)
 		{
-			float d = sqrtf(d2);
+			float d = sqrt(d2);
 			vec2 n = ab.normalize();
 			m.collision = true;
 			m.penetration = a.radius - d;
@@ -57,6 +57,142 @@ inline Manifold CirclevsAABB(Manifold m)
 		}
 	}
 
+	return m;
+}
+
+inline Manifold CirclevsAABB2(Manifold m)
+{
+	CircleStruct a = m.a.circle;
+	AABBStruct b = m.b.aabb;
+
+	vec2 aabbPos = getPosition(&m.b);
+
+	vec2 n = a.pos - aabbPos;
+
+	vec2 closest = n;
+
+	float x_extent = (b.max.x - b.min.x) / 2;
+	float y_extent = (b.max.y - b.min.y) / 2;
+
+	closest.x = clamp(-x_extent, x_extent, closest.x);
+	closest.y = clamp(-y_extent, y_extent, closest.y);
+
+	bool inside = false;
+
+	if (n.x == closest.x && n.y == closest.y)
+	{
+		inside = true;
+
+		if (abs(n.x) > abs(n.y))
+		{
+			if (closest.x > 0)
+				closest.x = x_extent;
+			else
+				closest.x = -x_extent;
+		}
+		else
+		{
+			// Clamp to closest extent
+			if (closest.y > 0)
+				closest.y = y_extent;
+			else
+				closest.y = -y_extent;
+		}
+	}
+
+		vec2 normal = n - closest;
+		double d = normal.lenSqr();
+		double r = a.radius;
+
+		if (d > r * r && !inside)
+			m.collision = false;
+
+		d = sqrt(d);
+
+		if (inside)
+		{
+			m.collision = true;
+			m.normal = -n;
+			m.penetration = r - d;
+		}
+		else
+		{
+			m.collision = true;
+			m.normal = n;
+			m.penetration = r - d;
+		}
+
+	return m;
+
+}
+
+inline Manifold CirclevsAABB3(Manifold m)
+{
+	AABBStruct AABB = m.b.aabb;
+	CircleStruct CIRCLE = m.a.circle;
+
+	vec2 aabbPos = (AABB.min + AABB.max) / 2;
+
+	vec2 n = CIRCLE.pos - aabbPos;
+
+	vec2 closest = n;
+
+	float x_extent = (AABB.max.x - AABB.min.x) / 2;
+	float y_extent = (AABB.max.y - AABB.min.y) / 2;
+
+	closest.x = clamp(-x_extent, x_extent, closest.x);
+	closest.y = clamp(-y_extent, y_extent, closest.y);
+
+
+	bool inside = false;
+
+	if (n.x == closest.x && n.y == closest.y) {
+		inside = true;
+
+		if (abs(n.x) > abs(n.y)) {
+			// Clamp to closest extent
+			if (closest.x > 0)
+				closest.x = x_extent;
+			else
+				closest.x = -x_extent;
+		}
+
+		// y axis is shorter
+		else {
+			// Clamp to closest extent
+			if (closest.y > 0)
+				closest.y = y_extent;
+			else
+				closest.y = -y_extent;
+		}
+	}
+
+	vec2 normal = n - closest;
+	float d = normal.lenSqr();
+	float r = CIRCLE.radius;
+
+// Early out of the radius is shorter than distance to closest point and
+// Circle not inside the AABB
+	if (d > (r * r) && !inside)
+	{
+		m.collision = false;
+		return m;
+	}
+		
+
+// Avoided sqrt until we needed
+	d = std::sqrt(d);
+
+	if (inside) {
+		m.normal = -normal / d;
+		m.penetration = r - d;
+	}
+	else {
+		m.normal = normal / d;
+		m.penetration = r - d;
+	}
+
+	m.collision = true;
 	return m;
 }
 
@@ -173,6 +309,7 @@ inline Manifold CirclevsCircle(Manifold m)
 		m.collision = true;
 		m.penetration = r - d;
 		m.normal = n / d;
+		std::cout << "Circle Normals: " << n << "\n";
 		return m;
 	}
 	else

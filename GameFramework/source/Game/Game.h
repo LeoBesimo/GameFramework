@@ -3,6 +3,7 @@
 #include "../Physics/CollisionDetection.h"
 
 #include "../Physics/Physics.h"
+#include "../Physics/cute_c2.h"
 
 #include <iostream>
 
@@ -21,8 +22,10 @@ float fps;
 vec2 mousePos;
 
 bool mousePressed = false;
+bool keyPressed = false;
 
 std::vector<PhysicsBody*> bodies;
+std::vector<PhysicsBody*> walls;
 
 bool create(int screenWidth, int screenHeight) {
 	srand(time(NULL));
@@ -49,7 +52,7 @@ bool create(int screenWidth, int screenHeight) {
 		if(true){
 		
 
-		vec2 dim = vec2(randomDouble(60, 80), randomDouble(60, 80));
+		vec2 dim = vec2(randomDouble(20, 40), randomDouble(20, 40));
 
 		//std::cout << i << " " << pos << " " << dim << " " << vel << " " << mass << "\n";
 
@@ -65,6 +68,16 @@ bool create(int screenWidth, int screenHeight) {
 		bodies[i]->color.w = 255;
 	}
 
+	for (unsigned int i = 0; i < 4; i++) {
+		walls.push_back(new PhysicsBody());
+		walls[i]->color = vec4(255, 0, 0, 255);
+	}
+
+	CreateAABB(walls[0], vec2(0,0), { (double) screenWidth,10 }, { 0,0 }, 1000000, 1);
+	CreateAABB(walls[1], vec2(0,screenHeight-10), { (double) screenWidth,10 }, { 0,0 }, 1000000, 1);
+	CreateAABB(walls[2], vec2(0, 0) ,vec2(10,screenHeight), { 0,0 }, 1000000, 1);
+	CreateAABB(walls[3], vec2(screenWidth-10 ,0), { 10, (double) screenHeight }, { 0,0 }, 1000000, 1);
+
 	//bodies.push_back(new PhysicsBody());
 	//CreateAABB(bodies[1], vec2(0,0), vec2(40,40), vec2(0,0), 50, 1);
 
@@ -77,6 +90,9 @@ bool create(int screenWidth, int screenHeight) {
 	return true;
 
 }
+
+std::vector<sf::VertexArray> lines;
+
 
 void run()
 {
@@ -109,11 +125,14 @@ void run()
 				mousePressed = true;
 			if (event.type == sf::Event::MouseButtonReleased)
 				mousePressed = false;
+			if (event.type == sf::Event::KeyPressed)
+				keyPressed = true;
+			if (event.type = sf::Event::KeyReleased)
+				keyPressed = false;
 			
 		}
 
 		//window->setFramerateLimit(map(mousePos.x, 0, windowSize.x, 60, 200));
-
 		if (mousePressed)
 		{
 			/*
@@ -134,7 +153,7 @@ void run()
 			}*/
 
 			bodies.push_back(new PhysicsBody());
-			float r = 20 + rand() % 20;
+			float r = 20 ; // + rand() % 20
 			vec2 vel = random2D() * 80;
 			float mass = 50 + rand() % 50;
 
@@ -177,15 +196,40 @@ void run()
 
 		double totalVel = 0;
 
+		window->clear(sf::Color::White);
+
+		lines.clear();
+
+
 		for(unsigned int i = 0; i < bodies.size(); i++){
 			updatePhysicsBody(bodies[i], deltaTime);
-			bounceInArea(bodies[i], { 0,0 }, windowSize);
-			constrainPhysicsObject(bodies[i], { 0,0 }, windowSize);
+			//bounceInArea(bodies[i], { 0,0 }, windowSize);
+			//constrainPhysicsObject(bodies[i], { 0,0 }, windowSize);
 			bodies[i]->color = vec4(255, 0, 0, 255);
 			//Manifold m;
 			//bodies[i]->color = vec4(255, 0, 255, 0);
 			//m.a = *bodies[i];
 			totalVel += bodies[i]->velocity.len();
+
+			sf::VertexArray line(sf::Lines,2);
+			vec2 bodyPos = getPosition(bodies[i]);
+			line[0].position = sf::Vector2f(bodyPos.x,bodyPos.y);
+			line[0].color = sf::Color::Magenta;
+
+			for (unsigned int j = 0; j < walls.size(); j++)
+			{
+				Manifold m = collide(bodies[i], walls[j]);
+				if(m.collision)
+				{
+					ResolveCollision(m, bodies[i], walls[j]);
+					walls[j]->velocity = vec2(0, 0);
+					line[1].position = sf::Vector2f( bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
+					line[1].color = sf::Color::Magenta;
+					lines.push_back(line);
+					//window->draw(line);
+				}
+			}
+
 			for(unsigned int j = 0; j < bodies.size(); j++){
 				//m.b = *bodies[j];
 				if(i != j)
@@ -196,6 +240,11 @@ void run()
 					if(m.collision)
 					{
 					ResolveCollision(m, bodies[i], bodies[j]);
+
+					line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
+					line[1].color = sf::Color::Magenta;
+					lines.push_back(line);
+
 					//positionalCorrection(m, bodies[i], bodies[j]);
 					vec4 c = bodies[i]->color + bodies[j]->color;//random4D() * 255;
 					c /= 2;
@@ -221,14 +270,21 @@ void run()
 		//shape.setRadius(body->circle.radius);
 		//circle.setRadius(mouseCircle->circle.radius);
 
-		window->clear(sf::Color::White);
 		
 		for (unsigned int i = 0; i < bodies.size(); i++) {
 			renderPhysicsObject(*window, bodies[i]);
 		}
 		//renderPhysicsObject(*window, mouseCircle, sf::Color::Blue);
 		//renderPhysicsObject(*window, body, sf::Color::Green);
-		
+		for (unsigned int i = 0; i < walls.size(); i++)
+		{
+			renderPhysicsObject(*window, walls[i]);
+		}
+
+		for (unsigned int i = 0; i < lines.size(); i++)
+		{
+			window->draw(lines[i]);
+		}
 		//window->draw(circle);
 		//window->draw(shape);
 		window->display();

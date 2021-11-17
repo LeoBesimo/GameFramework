@@ -150,6 +150,7 @@
     <ClInclude Include="source\Game\Game.h" />
     <ClInclude Include="source\Physics\BodyCreator.h" />
     <ClInclude Include="source\Physics\CollisionDetection.h" />
+    <ClInclude Include="source\Physics\cute_c2.h" />
     <ClInclude Include="source\Physics\Physics.h" />
     <ClInclude Include="source\Physics\PhysicsBodies.h" />
   </ItemGroup>

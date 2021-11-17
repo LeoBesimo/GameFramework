@@ -36,6 +36,9 @@
     <ClInclude Include="source\Physics\PhysicsBodies.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\Physics\cute_c2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">

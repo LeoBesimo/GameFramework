@@ -536,6 +536,11 @@ inline double max(double a, double b)
 	return a > b ? a : b;
 }
 
+inline double clamp(double a, double low, double hi)
+{
+	return max(low, min(a, hi));
+}
+
 inline vec2 minVec2(vec2 a, vec2 b)
 {
 	return vec2(min(a.x, b.x), min(a.y, b.y));
