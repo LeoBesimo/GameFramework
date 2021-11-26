@@ -4,6 +4,8 @@
 #include "BodyCreator.h"
 #include "SFML/Graphics.hpp"
 
+#define GRAVITY 20
+
 inline vec2 getPosition(PhysicsBody* body)
 {
 	switch (body->type)
@@ -50,6 +52,11 @@ inline void setPosition(PhysicsBody* body, vec2 pos)
 		body->acceleration.set(0, 0);*/
 		break;
 	}
+}
+
+inline void applyGravity(PhysicsBody* a, double deltaTime, int timeSteps)
+{
+	a->velocity.y += GRAVITY * deltaTime / timeSteps;
 }
 
 inline bool updatePhysicsBody(PhysicsBody* body, float deltaTime, int timeSteps)
@@ -100,24 +107,24 @@ inline bool updatePhysicsBody(PhysicsBody* body, float deltaTime)
 	switch (body->type)
 	{
 	case BodyType::Circle:
-		body->velocity += body->acceleration * deltaTime;
-		body->circle.pos += body->velocity * deltaTime;
+		body->velocity += body->acceleration * deltaTime * body->movable;
+		body->circle.pos += body->velocity * deltaTime * body->movable;
 		body->acceleration.set(0, 0);
 		return true;
 
 	case BodyType::AABB:
-		body->velocity += body->acceleration * deltaTime;
-		body->aabb.min += body->velocity * deltaTime;
-		body->aabb.max += body->velocity * deltaTime;
+		body->velocity += body->acceleration * deltaTime * body->movable;
+		body->aabb.min += body->velocity * deltaTime * body->movable;
+		body->aabb.max += body->velocity * deltaTime * body->movable;
 		body->acceleration.set(0, 0);
 		return true;
 
 	case BodyType::Polygon:
-		body->velocity += body->acceleration * deltaTime;
-		body->polygon.pos += body->velocity * deltaTime;
+		body->velocity += body->acceleration * deltaTime * body->movable;
+		body->polygon.pos += body->velocity * deltaTime * body->movable;
 		for (unsigned int i = 0; i < body->polygon.points.size(); i++) 
 		{
-			body->polygon.points[i] += body->velocity * deltaTime;
+			body->polygon.points[i] += body->velocity * deltaTime * body->movable;
 		}
 		body->acceleration.set(0, 0);
 		return true;

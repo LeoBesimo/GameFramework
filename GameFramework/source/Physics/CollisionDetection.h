@@ -340,34 +340,18 @@ void ResolveCollision(Manifold m, PhysicsBody *a, PhysicsBody *b)
 
 	vec2 impulse = m.normal * j;
 
-	a->velocity -= impulse * (1 / a->mass) * (a->movable == true ? 1 : 0);
-	b->velocity += impulse * (1 / b->mass) * (a->movable == true ? 1 : 0);
+	a->velocity -= impulse * (1 / a->mass) * a->movable;
+	b->velocity += impulse * (1 / b->mass) * b->movable;
 }
 
 inline void staticCollisionResolution(Manifold m, PhysicsBody* a, PhysicsBody* b)
 {
-	if (a->movable == false)
-	{
-		vec2 bPos = getPosition(b);
-		bPos += m.normal * m.penetration;
-		setPosition(b, bPos);
-	}
-	else if (b->movable == false)
-	{
-		vec2 aPos = getPosition(a);
-		aPos -= m.normal * m.penetration;
-		setPosition(a, aPos);
-	}
-	else
-	{
-		
 		vec2 aPos = getPosition(a);
 		vec2 bPos = getPosition(b);
-		aPos -= m.normal * (m.penetration / 2);
-		bPos += m.normal * (m.penetration / 2);
+		aPos -= m.normal * (m.penetration / 2) * a->movable;
+		bPos += m.normal * (m.penetration / 2) * b->movable;
 		setPosition(a, aPos);
 		setPosition(b, bPos);
-	}
 }
 
 inline void positionalCorrection(Manifold m,PhysicsBody* a, PhysicsBody* b)
@@ -378,8 +362,8 @@ inline void positionalCorrection(Manifold m,PhysicsBody* a, PhysicsBody* b)
 	vec2 pos1 = getPosition(a);
 	vec2 pos2 = getPosition(b);
 
-	pos1 -= correction * 1 / a->mass;
-	pos2 += correction * 1 / b->mass;
+	pos1 -= correction * 1 / a->mass * a->movable;
+	pos2 += correction * 1 / b->mass * b->movable;
 
 	setPosition(a, pos1);
 	setPosition(b, pos2);
