@@ -52,6 +52,49 @@ inline void setPosition(PhysicsBody* body, vec2 pos)
 	}
 }
 
+inline bool updatePhysicsBody(PhysicsBody* body, float deltaTime, int timeSteps)
+{
+
+	double tf = 1.0 / timeSteps;
+
+	//std::cout << tf << "\n";
+
+	switch (body->type)
+	{
+	case BodyType::Circle:
+	{
+		body->velocity += body->acceleration * deltaTime;
+		vec2 tempVel = body->velocity * deltaTime;
+		body->circle.pos += tempVel * tf;
+		body->acceleration.set(0, 0);
+		return true;
+	}
+
+	case BodyType::AABB:
+	{
+		body->velocity += body->acceleration * deltaTime;
+		vec2 tempVel = body->velocity * deltaTime;
+		body->aabb.min += tempVel * tf;
+		body->aabb.max += tempVel * tf;
+		body->acceleration.set(0, 0);
+		return true;
+	}
+	case BodyType::Polygon:
+	{
+		body->velocity += body->acceleration * deltaTime;
+		vec2 tempVel = body->velocity * deltaTime;
+		body->polygon.pos += tempVel * tf;
+		for (unsigned int i = 0; i < body->polygon.points.size(); i++)
+		{
+			body->polygon.points[i] += tempVel * tf;
+		}
+		body->acceleration.set(0, 0);
+		return true;
+	}
+	}
+	return false;
+}
+
 inline bool updatePhysicsBody(PhysicsBody* body, float deltaTime) 
 {
 	switch (body->type)

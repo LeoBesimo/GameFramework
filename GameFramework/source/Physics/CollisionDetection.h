@@ -5,6 +5,9 @@
 
 inline Manifold CirclevsAABB(Manifold m)
 {
+
+	double sf = 1920.0f;
+
 	m.collision = false;
 
 	CircleStruct a = m.a.circle;
@@ -21,7 +24,7 @@ inline Manifold CirclevsAABB(Manifold m)
 			float d = sqrt(d2);
 			vec2 n = ab.normalize();
 			m.collision = true;
-			m.penetration = a.radius - d;
+			m.penetration = (a.radius - d);
 			m.normal = n;
 		}
 
@@ -52,10 +55,11 @@ inline Manifold CirclevsAABB(Manifold m)
 			}
 
 			m.collision = true;
-			m.penetration = a.radius + depth;
+			m.penetration = (a.radius + depth);
 			m.normal = n;
 		}
 	}
+	//if(m.collision) std::cout << "AABB pos: " << getPosition(&m.b) << " Circle Pos: " << getPosition(&m.a) << " AABB vel: " << m.b.velocity << " Circle vel: " << m.a.velocity << " Normal: " << m.normal << " \n";
 
 	return m;
 }
@@ -307,9 +311,9 @@ inline Manifold CirclevsCircle(Manifold m)
 	if (d != 0)
 	{
 		m.collision = true;
-		m.penetration = r - d;
+		m.penetration = (a.radius + b.radius) - d;
 		m.normal = n / d;
-		std::cout << "Circle Normals: " << n << "\n";
+		//std::cout << "Circle Normals: " << n << " Penetration: " << m.penetration << "\n";
 		return m;
 	}
 	else
@@ -336,15 +340,41 @@ void ResolveCollision(Manifold m, PhysicsBody *a, PhysicsBody *b)
 
 	vec2 impulse = m.normal * j;
 
-	a->velocity -= impulse * (1 / a->mass);
-	b->velocity += impulse * (1 / b->mass);
+	a->velocity -= impulse * (1 / a->mass) * (a->movable == true ? 1 : 0);
+	b->velocity += impulse * (1 / b->mass) * (a->movable == true ? 1 : 0);
+}
+
+inline void staticCollisionResolution(Manifold m, PhysicsBody* a, PhysicsBody* b)
+{
+	if (a->movable == false)
+	{
+		vec2 bPos = getPosition(b);
+		bPos += m.normal * m.penetration;
+		setPosition(b, bPos);
+	}
+	else if (b->movable == false)
+	{
+		vec2 aPos = getPosition(a);
+		aPos -= m.normal * m.penetration;
+		setPosition(a, aPos);
+	}
+	else
+	{
+		
+		vec2 aPos = getPosition(a);
+		vec2 bPos = getPosition(b);
+		aPos -= m.normal * (m.penetration / 2);
+		bPos += m.normal * (m.penetration / 2);
+		setPosition(a, aPos);
+		setPosition(b, bPos);
+	}
 }
 
 inline void positionalCorrection(Manifold m,PhysicsBody* a, PhysicsBody* b)
 {
-	const float precent = 0.2;
+	const float percent = 1.1;
 	const float slop = 0.01;
-	vec2 correction = m.normal * (max(m.penetration - slop, 0.0f) / (1 / a->mass + 1 / b->mass));
+	vec2 correction = m.normal * (max(m.penetration - slop, 0.0f) / (1 / a->mass + 1 / b->mass)) * percent;
 	vec2 pos1 = getPosition(a);
 	vec2 pos2 = getPosition(b);
 
@@ -377,6 +407,8 @@ inline Manifold collide(PhysicsBody* a, PhysicsBody* b)
 			m.a = *b;
 			m.b = *a;
 			m = CirclevsAABB(m);
+			//positionalCorrection(m, a, b);
+			staticCollisionResolution(m, b, a);
 			return m;
 		}
 		case BodyType::Polygon:
@@ -395,6 +427,8 @@ inline Manifold collide(PhysicsBody* a, PhysicsBody* b)
 			m.a = *a;
 			m.b = *b;
 			m = CirclevsAABB(m);
+			//positionalCorrection(m, a, b);
+			staticCollisionResolution(m, a, b);
 			return m;
 		}
 		case BodyType::Circle:

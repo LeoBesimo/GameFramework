@@ -40,7 +40,7 @@ bool create(int screenWidth, int screenHeight) {
 	circle.setFillColor(sf::Color::Cyan);
 
 	windowSize = vec2(screenWidth, screenHeight);
-
+	
 	for (unsigned int i = 0; i < 20; i++) {
 		bodies.push_back(new PhysicsBody());
 
@@ -52,7 +52,7 @@ bool create(int screenWidth, int screenHeight) {
 		if(true){
 		
 
-		vec2 dim = vec2(randomDouble(20, 40), randomDouble(20, 40));
+		vec2 dim = vec2(randomDouble(25, 40), randomDouble(25, 40));
 
 		//std::cout << i << " " << pos << " " << dim << " " << vel << " " << mass << "\n";
 
@@ -67,10 +67,18 @@ bool create(int screenWidth, int screenHeight) {
 		bodies[i]->color = random4D() * 255; //vec4(255, 0, 255, 0);//random4D() * 255;
 		bodies[i]->color.w = 255;
 	}
+	
 
+	//bodies.push_back(new PhysicsBody());
+	//bodies.push_back(new PhysicsBody());
+
+	//CreateAABB(bodies[0], vec2(200, 200), { 40,20 }, { 60,0 }, 100, 1);
+	//CreateCircle(bodies[1], vec2(460, 440), 15, { 0,-60 }, 80, 1);
+	
 	for (unsigned int i = 0; i < 4; i++) {
 		walls.push_back(new PhysicsBody());
 		walls[i]->color = vec4(255, 0, 0, 255);
+		walls[i]->movable = false;
 	}
 
 	CreateAABB(walls[0], vec2(0,0), { (double) screenWidth,10 }, { 0,0 }, 1000000, 1);
@@ -93,6 +101,7 @@ bool create(int screenWidth, int screenHeight) {
 
 std::vector<sf::VertexArray> lines;
 
+int timeSteps = 2;
 
 void run()
 {
@@ -153,7 +162,7 @@ void run()
 			}*/
 
 			bodies.push_back(new PhysicsBody());
-			float r = 20 ; // + rand() % 20
+			float r = 10 ; // + rand() % 20
 			vec2 vel = random2D() * 80;
 			float mass = 50 + rand() % 50;
 
@@ -200,9 +209,14 @@ void run()
 
 		lines.clear();
 
+		for (unsigned int i = 0; i < bodies.size(); i++)
+		{
+			//std::cout << bodies[i]->velocity << " " << bodies[i]->acceleration << "\n";
+		}
 
+		for(unsigned int k = 0; k < timeSteps; k++){
 		for(unsigned int i = 0; i < bodies.size(); i++){
-			updatePhysicsBody(bodies[i], deltaTime);
+			updatePhysicsBody(bodies[i], deltaTime, timeSteps);
 			//bounceInArea(bodies[i], { 0,0 }, windowSize);
 			//constrainPhysicsObject(bodies[i], { 0,0 }, windowSize);
 			bodies[i]->color = vec4(255, 0, 0, 255);
@@ -222,7 +236,7 @@ void run()
 				if(m.collision)
 				{
 					ResolveCollision(m, bodies[i], walls[j]);
-					walls[j]->velocity = vec2(0, 0);
+					//walls[j]->velocity = vec2(0, 0);
 					line[1].position = sf::Vector2f( bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
 					line[1].color = sf::Color::Magenta;
 					lines.push_back(line);
@@ -239,7 +253,8 @@ void run()
 					//m = CirclevsCircle(m);
 					if(m.collision)
 					{
-					ResolveCollision(m, bodies[i], bodies[j]);
+					//ResolveCollision(m, bodies[i], bodies[j]);
+					staticCollisionResolution(m, bodies[i], bodies[j]);
 
 					line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
 					line[1].color = sf::Color::Magenta;
@@ -256,6 +271,7 @@ void run()
 					}
 				}
 			}
+		}
 		}
 
 		//std::cout << totalVel / bodies.size() << "\n";

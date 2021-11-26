@@ -31,6 +31,8 @@ typedef struct _PhysicsBody
 	AABBStruct aabb;
 	CircleStruct circle;
 	PolygonStruct polygon;
+	
+	bool movable = true;
 
 	vec2 acceleration;
 	vec2 velocity;
