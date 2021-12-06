@@ -1,10 +1,20 @@
 #pragma once
 
-#include "../Components/components.h"
+#include "components.h"
+#include "Materials.h"
 #include <vector>
 #include <memory>
 
 enum BodyType {AABB, Circle, Polygon, Null};
+
+typedef struct _MassData
+{
+	double mass;
+	double invMass;
+
+	double inertia;
+	double invInertia;
+} MassData;
 
 typedef struct _AABB
 {
@@ -33,12 +43,13 @@ typedef struct _PhysicsBody
 	PolygonStruct polygon;
 	
 	bool movable = true;
+	bool collidedWithImmovable = false;
 
-	vec2 acceleration;
+	vec2 force;
 	vec2 velocity;
 
-	float restitution = 0;
-	float mass = 0;
+	MassData massData;
+	Material material;
 
 	vec4 color = {255,255,255,255};
 

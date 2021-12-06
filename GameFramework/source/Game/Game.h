@@ -1,9 +1,12 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "../Physics/CollisionDetection.h"
 
-#include "../Physics/Physics.h"
-#include "../Physics/cute_c2.h"
+#include "components.h"
+#include "Physics.h"
+#include "CollisionDetection.h"
+#include "BodyCreator.h"
+
+#include "RenderPhysics.h"
 
 #include <iostream>
 
@@ -57,12 +60,12 @@ bool create(int screenWidth, int screenHeight) {
 			//std::cout << i << " " << pos << " " << dim << " " << vel << " " << mass << "\n";
 
 			//CreateCircle(bodies[i], pos, r, vel, mass, 1);
-			CreateAABB(bodies[i], pos, dim, vel, mass, 1);
+			CreateAABB(bodies[i], pos, dim, vel, SUPERBALL);
 		}
 		else
 		{
 			float r = randomDouble(20, 40);
-			CreateCircle(bodies[i], pos, r, vel, mass, 1);
+			CreateCircle(bodies[i], pos, r, vel, SUPERBALL);
 		}
 		bodies[i]->color = random4D() * 255; //vec4(255, 0, 255, 0);//random4D() * 255;
 		bodies[i]->color.w = 255;
@@ -81,10 +84,10 @@ bool create(int screenWidth, int screenHeight) {
 		walls[i]->movable = false;
 	}
 
-	CreateAABB(walls[0], vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, 1000000, 1);
-	CreateAABB(walls[1], vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, 1000000, 1);
-	CreateAABB(walls[2], vec2(0, 0), vec2(10, screenHeight), { 0,0 }, 1000000, 1);
-	CreateAABB(walls[3], vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, 1000000, 1);
+	CreateAABB(walls[0], vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, STATIC);
+	CreateAABB(walls[1], vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, STATIC);
+	CreateAABB(walls[2], vec2(0, 0), vec2(10, screenHeight), { 0,0 }, STATIC);
+	CreateAABB(walls[3], vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, STATIC);
 
 	//bodies.push_back(new PhysicsBody());
 	//CreateAABB(bodies[1], vec2(0,0), vec2(40,40), vec2(0,0), 50, 1);
@@ -144,29 +147,31 @@ void run()
 		//window->setFramerateLimit(map(mousePos.x, 0, windowSize.x, 60, 200));
 		if (mousePressed)
 		{
-			/*
+
 			unsigned int size = bodies.size();
-			for (int i = size-1; i < size-1 + 20; i++) {
+			for (int i = size - 1; i < size - 1 + 5; i++) {
 				//delete bodies[i];
 				//bodies[i] = new PhysicsBody();
 				bodies.push_back(new PhysicsBody());
 				vec2 pos = signRandom2D() * randomDouble(0, windowSize.x);
-				float r = 20 + rand() % 20;
+				float r = 5 + rand() % 5;
 				vec2 vel = random2D() * 80;
 				float mass = 50 + rand() % 50;
 
 				//std::cout << i << " " << pos << " " << r << " " << vel << " " << mass << "\n";
 
-				CreateCircle(bodies[i], pos, r, vel, mass, 1);
+				CreateCircle(bodies[i], pos, r, vel, STONE);
 				bodies[i]->color = random4D() * 255;//vec4(255, 0, 255, 0);
-			}*/
-
+			}
+			/*
 			bodies.push_back(new PhysicsBody());
 			float r = 10; // + rand() % 20
 			vec2 vel = random2D() * 80;
 			float mass = 50 + rand() % 50;
 
 			CreateCircle(bodies[bodies.size() - 1], mousePos, r, vel, mass, 1);
+			bodies[bodies.size() - 1]->color = random4D() * 255;
+			*/
 			mousePressed = false;
 		}
 
@@ -216,31 +221,32 @@ void run()
 
 		for (unsigned int k = 0; k < timeSteps; k++) {
 			for (unsigned int i = 0; i < bodies.size(); i++) {
-				applyGravity(bodies[i], deltaTime, timeSteps);
-				updatePhysicsBody(bodies[i], deltaTime, timeSteps);
+				//applyGravity(bodies[i], deltaTime, timeSteps);
+				lge::updatePhysicsBody(bodies[i], deltaTime, timeSteps);
 				//bounceInArea(bodies[i], { 0,0 }, windowSize);
 				//constrainPhysicsObject(bodies[i], { 0,0 }, windowSize);
-				bodies[i]->color = vec4(255, 0, 0, 255);
+				//bodies[i]->color = vec4(255, 0, 0, 255);
 				//Manifold m;
 				//bodies[i]->color = vec4(255, 0, 255, 0);
 				//m.a = *bodies[i];
 				totalVel += bodies[i]->velocity.len();
 
 				sf::VertexArray line(sf::Lines, 2);
-				vec2 bodyPos = getPosition(bodies[i]);
+				/*vec2 bodyPos = getPosition(bodies[i]);
 				line[0].position = sf::Vector2f(bodyPos.x, bodyPos.y);
-				line[0].color = sf::Color::Magenta;
+				line[0].color = sf::Color::Magenta;*/
 
 				for (unsigned int j = 0; j < walls.size(); j++)
 				{
 					Manifold m = collide(bodies[i], walls[j]);
 					if (m.collision)
 					{
+						//staticCollisionResolution(m, bodies[i], walls[j]);
 						ResolveCollision(m, bodies[i], walls[j]);
 						//walls[j]->velocity = vec2(0, 0);
-						line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
+						/*line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
 						line[1].color = sf::Color::Magenta;
-						lines.push_back(line);
+						lines.push_back(line);*/
 						//window->draw(line);
 					}
 				}
@@ -254,25 +260,25 @@ void run()
 						//m = CirclevsCircle(m);
 						if (m.collision)
 						{
-							//ResolveCollision(m, bodies[i], bodies[j]);
-							staticCollisionResolution(m, bodies[i], bodies[j]);
-
+							ResolveCollision(m, bodies[i], bodies[j]);
+							//staticCollisionResolution(m, bodies[i], bodies[j]);
+							/*
 							line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
 							line[1].color = sf::Color::Magenta;
-							lines.push_back(line);
+							lines.push_back(line);*/
 
 							//positionalCorrection(m, bodies[i], bodies[j]);
-							vec4 c = bodies[i]->color + bodies[j]->color;//random4D() * 255;
-							c /= 2;
+							vec4 c = random4D() * 255;//bodies[i]->color + bodies[j]->color;//random4D() * 255;
+							//c /= 2;
 							//c.limit(255^4);
 							c.w = 255;
 							//bodies[i]->color = c;//vec4(255, 255, 0, 0);
-							//bodies[j]->color = c;// vec4(255, 255, 0, 0);
-							bodies[i]->color = vec4(255, 0, 255, 0);
+							bodies[j]->color = c;// vec4(255, 255, 0, 0);
+							//bodies[i]->color = vec4(255, 0, 255, 0);
 						}
 					}
 				}
-				constrainPhysicsObject(bodies[i], vec2(), windowSize);
+				lge::constrainPhysicsBody(bodies[i], vec2(), windowSize);
 			}
 		}
 
@@ -322,13 +328,13 @@ void run()
 		}
 
 		img.create(200, 100, p);
-		
+
 		sf::Texture text;
 		text.loadFromImage(img);
 		sf::Sprite s;//
 		s.setTexture(text);
 		s.setPosition(200, 100);
-		window->draw(s);
+		//window->draw(s);
 
 		delete[] p;
 

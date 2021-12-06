@@ -1,5 +1,7 @@
 #pragma once
 
+#include "components.h"
+
 #include "PhysicsBodies.h"
 #include "Physics.h"
 
@@ -15,7 +17,7 @@ inline Manifold CirclevsAABB(Manifold m)
 
 	vec2 L = clampVec2(a.pos, b.min, b.max);
 	vec2 ab = L - a.pos;
-	float d2 = dotVec2(ab,ab);
+	float d2 = dotVec2(ab, ab);
 	float r2 = a.radius * a.radius;
 	if (d2 < r2)
 	{
@@ -69,7 +71,7 @@ inline Manifold CirclevsAABB2(Manifold m)
 	CircleStruct a = m.a.circle;
 	AABBStruct b = m.b.aabb;
 
-	vec2 aabbPos = getPosition(&m.b);
+	vec2 aabbPos = lge::getPosition(&m.b);
 
 	vec2 n = a.pos - aabbPos;
 
@@ -104,27 +106,27 @@ inline Manifold CirclevsAABB2(Manifold m)
 		}
 	}
 
-		vec2 normal = n - closest;
-		double d = normal.lenSqr();
-		double r = a.radius;
+	vec2 normal = n - closest;
+	double d = normal.lenSqr();
+	double r = a.radius;
 
-		if (d > r * r && !inside)
-			m.collision = false;
+	if (d > r * r && !inside)
+		m.collision = false;
 
-		d = sqrt(d);
+	d = sqrt(d);
 
-		if (inside)
-		{
-			m.collision = true;
-			m.normal = -n;
-			m.penetration = r - d;
-		}
-		else
-		{
-			m.collision = true;
-			m.normal = n;
-			m.penetration = r - d;
-		}
+	if (inside)
+	{
+		m.collision = true;
+		m.normal = -n;
+		m.penetration = r - d;
+	}
+	else
+	{
+		m.collision = true;
+		m.normal = n;
+		m.penetration = r - d;
+	}
 
 	return m;
 
@@ -175,16 +177,16 @@ inline Manifold CirclevsAABB3(Manifold m)
 	float d = normal.lenSqr();
 	float r = CIRCLE.radius;
 
-// Early out of the radius is shorter than distance to closest point and
-// Circle not inside the AABB
+	// Early out of the radius is shorter than distance to closest point and
+	// Circle not inside the AABB
 	if (d > (r * r) && !inside)
 	{
 		m.collision = false;
 		return m;
 	}
-		
 
-// Avoided sqrt until we needed
+
+	// Avoided sqrt until we needed
 	d = std::sqrt(d);
 
 	if (inside) {
@@ -267,11 +269,11 @@ inline Manifold AABBvsAABB(Manifold m)
 						m.normal = vec2(-1, 0);
 					else
 						m.normal = vec2(1, 0);
-					
+
 					m.penetration = x_overlap;
 					m.collision = true;
 					return m;
-					
+
 				}
 				else
 				{
@@ -280,7 +282,7 @@ inline Manifold AABBvsAABB(Manifold m)
 						m.normal = vec2(0, -1);
 					else
 						m.normal = vec2(0, 1);
-					
+
 					m.penetration = y_overlap;
 					m.collision = true;
 					return m;
@@ -325,49 +327,53 @@ inline Manifold CirclevsCircle(Manifold m)
 	}
 }
 
-void ResolveCollision(Manifold m, PhysicsBody *a, PhysicsBody *b) 
+void ResolveCollision(Manifold m, PhysicsBody* a, PhysicsBody* b)
 {
+
 	vec2 rv = b->velocity - a->velocity;
 
 	float velAlongNormal = dotVec2(rv, m.normal);
 
 	if (velAlongNormal > 0) return;
 
-	float e = fminf(a->restitution, b->restitution);
+	float e = fminf(a->material.restitution, b->material.restitution);
 
 	float j = -(1 + e) * velAlongNormal;
-	j /= 1 / a->mass + 1 / b->mass;
+	j /= a->massData.invMass + b->massData.invMass;
 
 	vec2 impulse = m.normal * j;
 
-	a->velocity -= impulse * (1 / a->mass) * a->movable;
-	b->velocity += impulse * (1 / b->mass) * b->movable;
+	a->velocity -= impulse * a->massData.invMass * a->movable;
+	b->velocity += impulse * b->massData.invMass * b->movable;
 }
 
 inline void staticCollisionResolution(Manifold m, PhysicsBody* a, PhysicsBody* b)
 {
-		vec2 aPos = getPosition(a);
-		vec2 bPos = getPosition(b);
-		aPos -= m.normal * (m.penetration / 2) * a->movable;
-		bPos += m.normal * (m.penetration / 2) * b->movable;
-		setPosition(a, aPos);
-		setPosition(b, bPos);
+	if (a->collidedWithImmovable || !a->movable) b->collidedWithImmovable = true;
+	if (b->collidedWithImmovable || !b->movable) a->collidedWithImmovable = true;
+
+	vec2 aPos = lge::getPosition(a);
+	vec2 bPos = lge::getPosition(b);
+	aPos -= m.normal * (m.penetration / 2) * (a->movable || !a->collidedWithImmovable);
+	bPos += m.normal * (m.penetration / 2) * (b->movable || !a->collidedWithImmovable);
+	lge::setPosition(a, aPos);
+	lge::setPosition(b, bPos);
 }
 
-inline void positionalCorrection(Manifold m,PhysicsBody* a, PhysicsBody* b)
+inline void positionalCorrection(Manifold m, PhysicsBody* a, PhysicsBody* b)
 {
 	const float percent = 1.1;
 	const float slop = 0.01;
-	vec2 correction = m.normal * (max(m.penetration - slop, 0.0f) / (1 / a->mass + 1 / b->mass)) * percent;
-	vec2 pos1 = getPosition(a);
-	vec2 pos2 = getPosition(b);
+	vec2 correction = m.normal * (max(m.penetration - slop, 0.0f) / (a->massData.invMass + b->massData.invMass)) * percent;
+	vec2 pos1 = lge::getPosition(a);
+	vec2 pos2 = lge::getPosition(b);
 
-	pos1 -= correction * 1 / a->mass * a->movable;
-	pos2 += correction * 1 / b->mass * b->movable;
+	pos1 -= correction * a->massData.invMass * a->movable;
+	pos2 += correction * b->massData.invMass * b->movable;
 
-	setPosition(a, pos1);
-	setPosition(b, pos2);
-	
+	lge::setPosition(a, pos1);
+	lge::setPosition(b, pos2);
+
 }
 
 inline Manifold collide(PhysicsBody* a, PhysicsBody* b)
@@ -443,6 +449,7 @@ inline Manifold collide(PhysicsBody* a, PhysicsBody* b)
 			break;
 		}
 		break;
+
 
 	case BodyType::Null:
 		switch (b->type)
