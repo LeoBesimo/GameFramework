@@ -1,13 +1,9 @@
-#include <SFML/Graphics.hpp>
-
 #include "Game/Game.h"
 
-#include <iostream>
+//#include "../Physics/src/Physics.h"
 
 int main()
 {
-//std::cout << "test" << "\n";
-
     create(1000 ,800);
     run();
     destroy();

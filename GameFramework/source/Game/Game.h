@@ -5,6 +5,7 @@
 #include "Physics.h"
 #include "CollisionDetection.h"
 #include "BodyCreator.h"
+#include "CollisionResolution.h"
 
 #include "RenderPhysics.h"
 
@@ -27,8 +28,8 @@ vec2 mousePos;
 bool mousePressed = false;
 bool keyPressed = false;
 
-std::vector<PhysicsBody*> bodies;
-std::vector<PhysicsBody*> walls;
+std::vector<lge::PhysicsBody*> bodies;
+std::vector<lge::PhysicsBody*> walls;
 
 bool create(int screenWidth, int screenHeight) {
 	srand(time(NULL));
@@ -45,7 +46,7 @@ bool create(int screenWidth, int screenHeight) {
 	windowSize = vec2(screenWidth, screenHeight);
 
 	for (unsigned int i = 0; i < 20; i++) {
-		bodies.push_back(new PhysicsBody());
+		bodies.push_back(new lge::PhysicsBody());
 
 		vec2 pos = signRandom2D() * randomDouble(0, screenWidth);
 
@@ -60,12 +61,12 @@ bool create(int screenWidth, int screenHeight) {
 			//std::cout << i << " " << pos << " " << dim << " " << vel << " " << mass << "\n";
 
 			//CreateCircle(bodies[i], pos, r, vel, mass, 1);
-			CreateAABB(bodies[i], pos, dim, vel, SUPERBALL);
+			lge::CreateAABB(bodies[i], pos, dim, vel, lge::SUPERBALL);
 		}
 		else
 		{
 			float r = randomDouble(20, 40);
-			CreateCircle(bodies[i], pos, r, vel, SUPERBALL);
+			lge::CreateCircle(bodies[i], pos, r, vel, lge::SUPERBALL);
 		}
 		bodies[i]->color = random4D() * 255; //vec4(255, 0, 255, 0);//random4D() * 255;
 		bodies[i]->color.w = 255;
@@ -79,15 +80,15 @@ bool create(int screenWidth, int screenHeight) {
 	//CreateCircle(bodies[1], vec2(460, 440), 15, { 0,-60 }, 80, 1);
 
 	for (unsigned int i = 0; i < 4; i++) {
-		walls.push_back(new PhysicsBody());
+		walls.push_back(new lge::PhysicsBody());
 		walls[i]->color = vec4(255, 0, 0, 255);
 		walls[i]->movable = false;
 	}
 
-	CreateAABB(walls[0], vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, STATIC);
-	CreateAABB(walls[1], vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, STATIC);
-	CreateAABB(walls[2], vec2(0, 0), vec2(10, screenHeight), { 0,0 }, STATIC);
-	CreateAABB(walls[3], vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, STATIC);
+	lge::CreateAABB(walls[0], vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, lge::STATIC);
+	lge::CreateAABB(walls[1], vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, lge::STATIC);
+	lge::CreateAABB(walls[2], vec2(0, 0), vec2(10, screenHeight), { 0,0 }, lge::STATIC);
+	lge::CreateAABB(walls[3], vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, lge::STATIC);
 
 	//bodies.push_back(new PhysicsBody());
 	//CreateAABB(bodies[1], vec2(0,0), vec2(40,40), vec2(0,0), 50, 1);
@@ -152,7 +153,7 @@ void run()
 			for (int i = size - 1; i < size - 1 + 5; i++) {
 				//delete bodies[i];
 				//bodies[i] = new PhysicsBody();
-				bodies.push_back(new PhysicsBody());
+				bodies.push_back(new lge::PhysicsBody());
 				vec2 pos = signRandom2D() * randomDouble(0, windowSize.x);
 				float r = 5 + rand() % 5;
 				vec2 vel = random2D() * 80;
@@ -160,7 +161,7 @@ void run()
 
 				//std::cout << i << " " << pos << " " << r << " " << vel << " " << mass << "\n";
 
-				CreateCircle(bodies[i], pos, r, vel, STONE);
+				CreateCircle(bodies[i], pos, r, vel, lge::STONE);
 				bodies[i]->color = random4D() * 255;//vec4(255, 0, 255, 0);
 			}
 			/*
@@ -201,12 +202,7 @@ void run()
 		//circle.setPosition(mouseCircle->circle.pos.x - body->circle.radius, mouseCircle->circle.pos.y - body->circle.radius);
 		//std::cout << "Radius:" << body->circle.radius << "\n";
 
-		//TODO: Update Other collision to work with new Manifold and return manifold
-		//TODO: Implement AABB collision detection Algorythm
-		//TODO: Implement Polygon collision detection and static resolution
-
 		//TODO: Extend physics rendering system
-		//TODO: Complete PhyscisBody constraining mechanism
 
 		double totalVel = 0;
 
@@ -221,8 +217,9 @@ void run()
 
 		for (unsigned int k = 0; k < timeSteps; k++) {
 			for (unsigned int i = 0; i < bodies.size(); i++) {
-				//applyGravity(bodies[i], deltaTime, timeSteps);
 				lge::updatePhysicsBody(bodies[i], deltaTime, timeSteps);
+				//applyGravity(bodies[i], deltaTime, timeSteps);
+				//lge::updatePhysicsBody(bodies[i], deltaTime, timeSteps);
 				//bounceInArea(bodies[i], { 0,0 }, windowSize);
 				//constrainPhysicsObject(bodies[i], { 0,0 }, windowSize);
 				//bodies[i]->color = vec4(255, 0, 0, 255);
@@ -238,11 +235,11 @@ void run()
 
 				for (unsigned int j = 0; j < walls.size(); j++)
 				{
-					Manifold m = collide(bodies[i], walls[j]);
+					lge::Manifold m = lge::Collide(bodies[i], walls[j]);
 					if (m.collision)
 					{
 						//staticCollisionResolution(m, bodies[i], walls[j]);
-						ResolveCollision(m, bodies[i], walls[j]);
+						lge::ResolveCollision(m, bodies[i], walls[j]);
 						//walls[j]->velocity = vec2(0, 0);
 						/*line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
 						line[1].color = sf::Color::Magenta;
@@ -255,12 +252,12 @@ void run()
 					//m.b = *bodies[j];
 					if (i != j)
 					{
-						Manifold m = collide(bodies[i], bodies[j]);
+						lge::Manifold m = lge::Collide(bodies[i], bodies[j]);
 						//m = AABBvsAABB(m);
 						//m = CirclevsCircle(m);
 						if (m.collision)
 						{
-							ResolveCollision(m, bodies[i], bodies[j]);
+							lge::ResolveCollision(m, bodies[i], bodies[j]);
 							//staticCollisionResolution(m, bodies[i], bodies[j]);
 							/*
 							line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
@@ -278,7 +275,7 @@ void run()
 						}
 					}
 				}
-				lge::constrainPhysicsBody(bodies[i], vec2(), windowSize);
+				//lge::constrainPhysicsBody(bodies[i], vec2(), windowSize);
 			}
 		}
 

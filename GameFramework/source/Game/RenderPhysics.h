@@ -4,12 +4,12 @@
 #include "PhysicsBodies.h"
 #include "components.h"
 
-inline void renderPhysicsObject(sf::RenderWindow& target, PhysicsBody* body, sf::Color fillColor)
+inline void renderPhysicsObject(sf::RenderWindow& target, lge::PhysicsBody* body, sf::Color fillColor)
 {
 
 	switch (body->type)
 	{
-	case BodyType::AABB:
+	case lge::BodyType::AABB:
 	{
 		sf::RectangleShape rect;
 		rect.setPosition(body->aabb.min.x, body->aabb.min.y);
@@ -30,7 +30,7 @@ inline void renderPhysicsObject(sf::RenderWindow& target, PhysicsBody* body, sf:
 		break;
 	}
 
-	case BodyType::Circle:
+	case lge::BodyType::Circle:
 	{
 		sf::CircleShape circle;
 		circle.setPosition(body->circle.pos.x - body->circle.radius, body->circle.pos.y - body->circle.radius);
@@ -40,7 +40,7 @@ inline void renderPhysicsObject(sf::RenderWindow& target, PhysicsBody* body, sf:
 		break;
 	}
 
-	case BodyType::Polygon:
+	case lge::BodyType::Polygon:
 	{
 		sf::ConvexShape shape;
 		shape.setPointCount(body->polygon.points.size());
@@ -54,12 +54,12 @@ inline void renderPhysicsObject(sf::RenderWindow& target, PhysicsBody* body, sf:
 		break;
 	}
 
-	case BodyType::Null:
+	case lge::BodyType::Null:
 		break;
 	}
 }
 
-inline void renderPhysicsObject(sf::RenderWindow& target, PhysicsBody* body)
+inline void renderPhysicsObject(sf::RenderWindow& target, lge::PhysicsBody* body)
 {
 	renderPhysicsObject(target, body, sf::Color(body->color.x, body->color.y, body->color.z, body->color.w));
 }

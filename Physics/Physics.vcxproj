@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{dbfbd368-ea88-449c-a494-6fce6569e20f}</ProjectGuid>
+    <ProjectGuid>{367a2a6f-0757-4dc5-9f89-85bd26cd69f6}</ProjectGuid>
     <RootNamespace>Physics</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -88,6 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)BasicLibrary\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,6 +103,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)BasicLibrary\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,14 +143,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\BodyCreator.cpp" />
+    <ClCompile Include="src\CollisionDetection.cpp" />
+    <ClCompile Include="src\CollisonResolution.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="src\BodyCreator.h" />
     <ClInclude Include="src\CollisionDetection.h" />
+    <ClInclude Include="src\CollisionResolution.h" />
     <ClInclude Include="src\Materials.h" />
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\PhysicsBodies.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Physics.cpp" />
+    <ProjectReference Include="..\BasicLibrary\BasicLibrary.vcxproj">
+      <Project>{11bd193c-64c8-4d39-9587-c44b29f65620}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
