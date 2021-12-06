@@ -85,10 +85,10 @@ bool create(int screenWidth, int screenHeight) {
 		walls[i]->movable = false;
 	}
 
-	lge::CreateAABB(walls[0], vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, lge::STATIC);
-	lge::CreateAABB(walls[1], vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, lge::STATIC);
-	lge::CreateAABB(walls[2], vec2(0, 0), vec2(10, screenHeight), { 0,0 }, lge::STATIC);
-	lge::CreateAABB(walls[3], vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, lge::STATIC);
+	lge::CreateAABB(walls[0], vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, lge::Material(0,1));
+	lge::CreateAABB(walls[1], vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, lge::Material(0, 1));
+	lge::CreateAABB(walls[2], vec2(0, 0), vec2(10, screenHeight), { 0,0 }, { 0,1 });
+	lge::CreateAABB(walls[3], vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, lge::Material(0, 1));
 
 	//bodies.push_back(new PhysicsBody());
 	//CreateAABB(bodies[1], vec2(0,0), vec2(40,40), vec2(0,0), 50, 1);
@@ -161,7 +161,7 @@ void run()
 
 				//std::cout << i << " " << pos << " " << r << " " << vel << " " << mass << "\n";
 
-				CreateCircle(bodies[i], pos, r, vel, lge::STONE);
+				CreateCircle(bodies[i], pos, r, vel, lge::PERFECT);
 				bodies[i]->color = random4D() * 255;//vec4(255, 0, 255, 0);
 			}
 			/*

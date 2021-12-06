@@ -2,11 +2,14 @@
 
 namespace lge
 {
-
 	struct Material
 	{
 		double density;
 		double restitution;
+
+		Material(double density = 0, double restitution = 0) :
+			density(density), restitution(restitution)
+		{}
 	};
 
 	const Material STONE = { 0.6,0.2 };
@@ -17,5 +20,4 @@ namespace lge
 	const Material PILLOW = { 0.1,0.2 };
 	const Material STATIC = { 0,0.4 };
 	const Material PERFECT = { 1,1 };
-
 }
