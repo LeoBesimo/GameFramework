@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-#include "components.h"
+#include "Components.h"
 #include "Physics.h"
 #include "CollisionDetection.h"
 #include "BodyCreator.h"
@@ -13,8 +13,8 @@
 
 sf::RenderWindow* window;
 
-vec2 screenScaling;
-vec2 windowSize;
+lge::vec2 screenScaling;
+lge::vec2 windowSize;
 
 sf::CircleShape shape(100.f);
 sf::CircleShape circle(100.f);
@@ -23,7 +23,7 @@ sf::Clock deltaClock;
 float deltaTime;
 float fps;
 
-vec2 mousePos;
+lge::vec2 mousePos;
 
 bool mousePressed = false;
 bool keyPressed = false;
@@ -35,7 +35,7 @@ bool create(int screenWidth, int screenHeight) {
 	srand(time(NULL));
 
 	sf::Vector2i screenSize = sf::Vector2i(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height);
-	screenScaling = vec2(screenSize.x / screenWidth, screenSize.y / screenHeight);
+	screenScaling = lge::vec2(screenSize.x / screenWidth, screenSize.y / screenHeight);
 
 	window = new sf::RenderWindow(sf::VideoMode(screenWidth, screenHeight), "Yeet");
 	window->setFramerateLimit(120);
@@ -43,20 +43,20 @@ bool create(int screenWidth, int screenHeight) {
 	shape.setFillColor(sf::Color::Green);
 	circle.setFillColor(sf::Color::Cyan);
 
-	windowSize = vec2(screenWidth, screenHeight);
+	windowSize = lge::vec2(screenWidth, screenHeight);
 
 	for (unsigned int i = 0; i < 20; i++) {
 		bodies.push_back(new lge::PhysicsBody());
 
-		vec2 pos = signRandom2D() * randomDouble(0, screenWidth);
+		lge::vec2 pos = lge::signRandom2D() * lge::randomDouble(0, screenWidth);
 
-		vec2 vel = random2D() * 80;
+		lge::vec2 vel = lge::random2D() * 80;
 		float mass = 50 + rand() % 50;
 
 		if (true) {
 
 
-			vec2 dim = vec2(randomDouble(25, 40), randomDouble(25, 40));
+			lge::vec2 dim = lge::vec2(lge::randomDouble(25, 40), lge::randomDouble(25, 40));
 
 			//std::cout << i << " " << pos << " " << dim << " " << vel << " " << mass << "\n";
 
@@ -65,10 +65,10 @@ bool create(int screenWidth, int screenHeight) {
 		}
 		else
 		{
-			float r = randomDouble(20, 40);
+			float r = lge::randomDouble(20, 40);
 			lge::CreateCircle(bodies[i], pos, r, vel, lge::SUPERBALL);
 		}
-		bodies[i]->color = random4D() * 255; //vec4(255, 0, 255, 0);//random4D() * 255;
+		bodies[i]->color = lge::random4D() * 255; //vec4(255, 0, 255, 0);//random4D() * 255;
 		bodies[i]->color.w = 255;
 	}
 
@@ -81,14 +81,14 @@ bool create(int screenWidth, int screenHeight) {
 
 	for (unsigned int i = 0; i < 4; i++) {
 		walls.push_back(new lge::PhysicsBody());
-		walls[i]->color = vec4(255, 0, 0, 255);
+		walls[i]->color = lge::vec4(255, 0, 0, 255);
 		walls[i]->movable = false;
 	}
 
-	lge::CreateAABB(walls[0], vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, lge::Material(0,1));
-	lge::CreateAABB(walls[1], vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, lge::Material(0, 1));
-	lge::CreateAABB(walls[2], vec2(0, 0), vec2(10, screenHeight), { 0,0 }, { 0,1 });
-	lge::CreateAABB(walls[3], vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, lge::Material(0, 1));
+	lge::CreateAABB(walls[0], lge::vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, lge::Material(0,1));
+	lge::CreateAABB(walls[1], lge::vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, lge::Material(0, 1));
+	lge::CreateAABB(walls[2], lge::vec2(0, 0), lge::vec2(10, screenHeight), { 0,0 }, { 0,1 });
+	lge::CreateAABB(walls[3], lge::vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, lge::Material(0, 1));
 
 	//bodies.push_back(new PhysicsBody());
 	//CreateAABB(bodies[1], vec2(0,0), vec2(40,40), vec2(0,0), 50, 1);
@@ -154,15 +154,15 @@ void run()
 				//delete bodies[i];
 				//bodies[i] = new PhysicsBody();
 				bodies.push_back(new lge::PhysicsBody());
-				vec2 pos = signRandom2D() * randomDouble(0, windowSize.x);
+				lge::vec2 pos = lge::signRandom2D() * lge::randomDouble(0, windowSize.x);
 				float r = 5 + rand() % 5;
-				vec2 vel = random2D() * 80;
+				lge::vec2 vel = lge::random2D() * 80;
 				float mass = 50 + rand() % 50;
 
 				//std::cout << i << " " << pos << " " << r << " " << vel << " " << mass << "\n";
 
 				CreateCircle(bodies[i], pos, r, vel, lge::PERFECT);
-				bodies[i]->color = random4D() * 255;//vec4(255, 0, 255, 0);
+				bodies[i]->color = lge::random4D() * 255;//vec4(255, 0, 255, 0);
 			}
 			/*
 			bodies.push_back(new PhysicsBody());
@@ -265,7 +265,7 @@ void run()
 							lines.push_back(line);*/
 
 							//positionalCorrection(m, bodies[i], bodies[j]);
-							vec4 c = random4D() * 255;//bodies[i]->color + bodies[j]->color;//random4D() * 255;
+							lge::vec4 c = lge::random4D() * 255;//bodies[i]->color + bodies[j]->color;//random4D() * 255;
 							//c /= 2;
 							//c.limit(255^4);
 							c.w = 255;

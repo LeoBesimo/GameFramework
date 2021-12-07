@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "PhysicsBodies.h"
-#include "components.h"
+#include "Components.h"
 
 inline void renderPhysicsObject(sf::RenderWindow& target, lge::PhysicsBody* body, sf::Color fillColor)
 {
@@ -13,7 +13,7 @@ inline void renderPhysicsObject(sf::RenderWindow& target, lge::PhysicsBody* body
 	{
 		sf::RectangleShape rect;
 		rect.setPosition(body->aabb.min.x, body->aabb.min.y);
-		vec2 dim = body->aabb.max - body->aabb.min;
+		lge::vec2 dim = body->aabb.max - body->aabb.min;
 		//std::cout << dim << "\n";
 		rect.setSize(sf::Vector2f(dim.x, dim.y));
 		rect.setFillColor(fillColor);

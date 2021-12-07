@@ -1,6 +1,7 @@
 #pragma once
 
-#include "components.h"
+#include "Components.h"
+#include "Utilities.h"
 #include "PhysicsBodies.h"
 
 namespace lge

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "components.h"
+#include "Components.h"
 #include "Materials.h"
 #include <vector>
-#include <memory>
 
 namespace lge
 {

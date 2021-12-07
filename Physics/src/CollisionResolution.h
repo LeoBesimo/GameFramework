@@ -3,6 +3,7 @@
 #include "PhysicsBodies.h"
 #include "CollisionDetection.h"
 #include "Physics.h"
+#include "Utilities.h"
 
 namespace lge
 {
