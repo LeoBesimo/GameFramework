@@ -31,6 +31,8 @@ bool keyPressed = false;
 std::vector<lge::PhysicsBody*> bodies;
 std::vector<lge::PhysicsBody*> walls;
 
+lge::PhysicsBody* player = new lge::PhysicsBody();
+
 bool create(int screenWidth, int screenHeight) {
 	srand(time(NULL));
 
@@ -38,14 +40,17 @@ bool create(int screenWidth, int screenHeight) {
 	screenScaling = lge::vec2(screenSize.x / screenWidth, screenSize.y / screenHeight);
 
 	window = new sf::RenderWindow(sf::VideoMode(screenWidth, screenHeight), "Yeet");
-	window->setFramerateLimit(120);
+	window->setFramerateLimit(60);
 
 	shape.setFillColor(sf::Color::Green);
 	circle.setFillColor(sf::Color::Cyan);
 
 	windowSize = lge::vec2(screenWidth, screenHeight);
 
-	for (unsigned int i = 0; i < 20; i++) {
+	lge::CreateAABB(player, lge::vec2(200, 100), lge::vec2(40, 80), lge::vec2(), lge::WOOD);
+	player->color = lge::vec4(255, 255, 0, 255);
+
+	for (unsigned int i = 0; i < 10; i++) {
 		bodies.push_back(new lge::PhysicsBody());
 
 		lge::vec2 pos = lge::signRandom2D() * lge::randomDouble(0, screenWidth);
@@ -90,6 +95,12 @@ bool create(int screenWidth, int screenHeight) {
 	lge::CreateAABB(walls[2], lge::vec2(0, 0), lge::vec2(10, screenHeight), { 0,0 }, { 0,1 });
 	lge::CreateAABB(walls[3], lge::vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, lge::Material(0, 1));
 
+	for (int i = 0; i < walls.size(); i++)
+	{
+		walls[i]->material.dynamicFriction = 0.6;
+		walls[i]->material.staticFriction = 0.9;
+	}
+
 	//bodies.push_back(new PhysicsBody());
 	//CreateAABB(bodies[1], vec2(0,0), vec2(40,40), vec2(0,0), 50, 1);
 
@@ -97,10 +108,7 @@ bool create(int screenWidth, int screenHeight) {
 	{
 		//std::cout << randomDouble(-1, 1) << "\n";
 	}
-
-
 	return true;
-
 }
 
 std::vector<sf::VertexArray> lines;
@@ -109,17 +117,6 @@ int timeSteps = 2;
 
 void run()
 {
-
-	//PhysicsBody* body = new PhysicsBody();
-	//bool done = CreateCircle(body, vec2(300, 300), 60, vec2(60, 0), 100, 1);
-	//PhysicsBody* mouseCircle = new PhysicsBody();
-	//CreateCircle(mouseCircle, vec2(500, 500), 60, vec2(40,35), 100, 1);
-
-	//std::cout << done << "\n";
-	//std::cout << "X:" << body->circle.pos.x << " Y:" << body->circle.pos.y << "\n";
-
-
-
 	while (window->isOpen()) {
 
 		sf::Event event;
@@ -139,13 +136,13 @@ void run()
 			if (event.type == sf::Event::MouseButtonReleased)
 				mousePressed = false;
 			if (event.type == sf::Event::KeyPressed)
+			{
 				keyPressed = true;
-			if (event.type = sf::Event::KeyReleased)
+			}
+			if (event.type == sf::Event::KeyReleased)
 				keyPressed = false;
-
 		}
 
-		//window->setFramerateLimit(map(mousePos.x, 0, windowSize.x, 60, 200));
 		if (mousePressed)
 		{
 
@@ -164,43 +161,8 @@ void run()
 				CreateCircle(bodies[i], pos, r, vel, lge::PERFECT);
 				bodies[i]->color = lge::random4D() * 255;//vec4(255, 0, 255, 0);
 			}
-			/*
-			bodies.push_back(new PhysicsBody());
-			float r = 10; // + rand() % 20
-			vec2 vel = random2D() * 80;
-			float mass = 50 + rand() % 50;
-
-			CreateCircle(bodies[bodies.size() - 1], mousePos, r, vel, mass, 1);
-			bodies[bodies.size() - 1]->color = random4D() * 255;
-			*/
 			mousePressed = false;
 		}
-
-		//updatePhysicsBody(body, deltaTime);
-		//updatePhysicsBody(mouseCircle, deltaTime);
-
-		//mouseCircle->circle.pos.x = constrain(mouseCircle->circle.pos.x, mouseCircle->circle.radius, windowSize.x - mouseCircle->circle.radius);
-		//mouseCircle->circle.pos.y = constrain(mouseCircle->circle.pos.y, mouseCircle->circle.radius, windowSize.y - mouseCircle->circle.radius);
-		/*
-		if (body->circle.pos.x > windowSize.x - body->circle.radius || body->circle.pos.x < body->circle.radius) body->velocity.x *= -1;
-		if (body->circle.pos.y > windowSize.y - body->circle.radius || body->circle.pos.y < body->circle.radius) body->velocity.y *= -1;
-
-		if (mouseCircle->circle.pos.x > windowSize.x - mouseCircle->circle.radius || mouseCircle->circle.pos.x < mouseCircle->circle.radius) mouseCircle->velocity.x *= -1;
-		if (mouseCircle->circle.pos.y > windowSize.y - mouseCircle->circle.radius || mouseCircle->circle.pos.y < mouseCircle->circle.radius) mouseCircle->velocity.y *= -1;
-
-		constrainPhysicsObject(body, vec2(0, 0), windowSize);
-		constrainPhysicsObject(mouseCircle, vec2(0, 0), windowSize);
-
-		*/
-
-		//vec2 dim = bodies[1]->aabb.max - bodies[1]->aabb.min;
-		//bodies[1]->aabb.min = mousePos;
-		//bodies[1]->aabb.max = mousePos + dim;
-
-		//mouseCircle->circle.pos = mousePos;
-		//shape.setPosition(sf::Vector2f(body->circle.pos.x - body->circle.radius, body->circle.pos.y - body->circle.radius));
-		//circle.setPosition(mouseCircle->circle.pos.x - body->circle.radius, mouseCircle->circle.pos.y - body->circle.radius);
-		//std::cout << "Radius:" << body->circle.radius << "\n";
 
 		//TODO: Extend physics rendering system
 
@@ -215,23 +177,51 @@ void run()
 			//std::cout << bodies[i]->velocity << " " << bodies[i]->acceleration << "\n";
 		}
 
+		player->movable = true;
+
+		//lge::vec2 force = lge::forceForDesiredVelocity(*player, lge::vec2(5, 0), deltaTime, 1);
+		//std::cout << force << "\n";
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(-5, 0), deltaTime, 1));
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(5, 0), deltaTime, 1));
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(0, -5), deltaTime, 1));
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(0, 5), deltaTime, 1));
+
+		//std::cout << player->force << " " << player->velocity << "\n";
+		lge::updatePhysicsBody(player, deltaTime, 1);
+		//std::cout << player->force << " " << player->velocity << "\n";
+		//std::cout << "Player: " << player->velocity << " " << deltaTime << "\n";
+
+		for (unsigned int i = 0; i < walls.size(); i++)
+		{
+			lge::Manifold wp = lge::Collide(player, walls[i]);
+			if (wp.collision)
+			{
+				//std::cout << "collide\n";
+				//lge::ApplyFriction(wp, player, walls[i]);
+				lge::ResolveCollisionStatic(wp, player, walls[i]);
+
+			}
+		}
+
 		for (unsigned int k = 0; k < timeSteps; k++) {
 			for (unsigned int i = 0; i < bodies.size(); i++) {
 				lge::updatePhysicsBody(bodies[i], deltaTime, timeSteps);
+				//std::cout << bodies[i]->velocity << " " << deltaTime << "\n";
 				//applyGravity(bodies[i], deltaTime, timeSteps);
 				//lge::updatePhysicsBody(bodies[i], deltaTime, timeSteps);
 				//bounceInArea(bodies[i], { 0,0 }, windowSize);
 				//constrainPhysicsObject(bodies[i], { 0,0 }, windowSize);
-				//bodies[i]->color = vec4(255, 0, 0, 255);
-				//Manifold m;
-				//bodies[i]->color = vec4(255, 0, 255, 0);
-				//m.a = *bodies[i];
 				totalVel += bodies[i]->velocity.len();
 
-				sf::VertexArray line(sf::Lines, 2);
-				/*vec2 bodyPos = getPosition(bodies[i]);
-				line[0].position = sf::Vector2f(bodyPos.x, bodyPos.y);
-				line[0].color = sf::Color::Magenta;*/
+				/*lge::Manifold pm = lge::Collide(player, bodies[i]);
+				if (pm.collision)
+				{
+					//lge::ResolveCollisionStatic(pm, player, bodies[i]);
+				}*/
 
 				for (unsigned int j = 0; j < walls.size(); j++)
 				{
@@ -240,6 +230,7 @@ void run()
 					{
 						//staticCollisionResolution(m, bodies[i], walls[j]);
 						lge::ResolveCollision(m, bodies[i], walls[j]);
+						//lge::ApplyFriction(m, bodies[i], bodies[j]);
 						//walls[j]->velocity = vec2(0, 0);
 						/*line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
 						line[1].color = sf::Color::Magenta;
@@ -249,58 +240,39 @@ void run()
 				}
 
 				for (unsigned int j = 0; j < bodies.size(); j++) {
-					//m.b = *bodies[j];
 					if (i != j)
 					{
 						lge::Manifold m = lge::Collide(bodies[i], bodies[j]);
-						//m = AABBvsAABB(m);
-						//m = CirclevsCircle(m);
+
 						if (m.collision)
 						{
 							lge::ResolveCollision(m, bodies[i], bodies[j]);
+							lge::ApplyFriction(m, bodies[i], bodies[j]);
 							//staticCollisionResolution(m, bodies[i], bodies[j]);
-							/*
-							line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
-							line[1].color = sf::Color::Magenta;
-							lines.push_back(line);*/
+						
 
-							//positionalCorrection(m, bodies[i], bodies[j]);
-							lge::vec4 c = lge::random4D() * 255;//bodies[i]->color + bodies[j]->color;//random4D() * 255;
-							//c /= 2;
-							//c.limit(255^4);
+							lge::vec4 c = lge::random4D() * 255;
 							c.w = 255;
-							//bodies[i]->color = c;//vec4(255, 255, 0, 0);
 							bodies[j]->color = c;// vec4(255, 255, 0, 0);
-							//bodies[i]->color = vec4(255, 0, 255, 0);
 						}
 					}
 				}
-				//lge::constrainPhysicsBody(bodies[i], vec2(), windowSize);
+				lge::constrainPhysicsBody(bodies[i], lge::vec2(), windowSize);
 			}
 		}
 
-		//std::cout << totalVel / bodies.size() << "\n";
-		/*
-		if (m.collision)
-			circle.setFillColor(sf::Color::Blue);
-		else
-			circle.setFillColor(sf::Color::Cyan);*/
-
-			//ResolveCollision(m,body,mouseCircle);
-
-			//shape.setRadius(body->circle.radius);
-			//circle.setRadius(mouseCircle->circle.radius);
 
 
 		for (unsigned int i = 0; i < bodies.size(); i++) {
 			renderPhysicsObject(*window, bodies[i]);
 		}
-		//renderPhysicsObject(*window, mouseCircle, sf::Color::Blue);
-		//renderPhysicsObject(*window, body, sf::Color::Green);
+
 		for (unsigned int i = 0; i < walls.size(); i++)
 		{
 			renderPhysicsObject(*window, walls[i]);
 		}
+
+		renderPhysicsObject(*window, player);
 
 		for (unsigned int i = 0; i < lines.size(); i++)
 		{
@@ -335,13 +307,11 @@ void run()
 
 		delete[] p;
 
-		//window->draw(circle);
-		//window->draw(shape);
 		window->display();
 
 		deltaTime = deltaClock.restart().asSeconds();
 		fps = 1 / deltaTime;
-		//std::cout << fps << "\n";
+		//std::cout << fps << " " << deltaTime<< "\n";
 	}
 }
 

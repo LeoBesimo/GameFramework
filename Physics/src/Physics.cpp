@@ -50,6 +50,18 @@ namespace lge
 		}
 	}
 
+	vec2 forceForDesiredVelocity(const PhysicsBody &body, vec2 desiredVelocity, double deltaTime, double timeSteps)
+	{
+		return desiredVelocity / deltaTime / body.massData.invMass * timeSteps;
+	}
+
+	void applyForce(PhysicsBody* body, vec2 force)
+	{
+		//std::cout << "Applying force: " << force * deltaTime / timeSteps * body->movable << "\n";
+		body->force += force * body->movable;
+		//std::cout << "Body force: " << body->force << "\n";
+	}
+
 	void applyGravity(PhysicsBody* body, double deltaTime, double timeSteps)
 	{
 		body->velocity.y += lge::GRAVITY * deltaTime * timeSteps;

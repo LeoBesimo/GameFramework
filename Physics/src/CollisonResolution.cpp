@@ -34,6 +34,51 @@ namespace lge
 		setPosition(b, bPos);
 	}
 
+	void ApplyFriction(Manifold m, PhysicsBody* a, PhysicsBody* b)
+	{
+		vec2 rv = b->velocity - a->velocity;
+		vec2 t = rv - m.normal * dotVec2(rv, m.normal);
+		t.normalize();
+
+		//t *= -1;
+
+		float velAlongNormal = dotVec2(rv, m.normal);
+
+		if (velAlongNormal > 0) return;
+		
+		float e = fminf(a->material.restitution, b->material.restitution);
+
+		float j = -(1 + e) * velAlongNormal;
+		j /= a->massData.invMass + b->massData.invMass;
+
+		float jt = -dotVec2(rv, m.normal);
+		//std::cout << -dotVec2(rv, m.normal) << "\n";
+		jt = jt / (a->massData.invMass + b->massData.invMass);
+
+		float mu = PythagoreanSolve(a->material.staticFriction, b->material.staticFriction);
+		
+		vec2 frictionImpulse;
+		//std::cout << jt << " " << mu << " " << j << " " << j * mu << "\n";
+
+		if ((jt) < j * mu)
+		{
+			//std::cout << "static \n";
+			frictionImpulse = t * jt;
+		}
+		else
+		{
+			//std::cout << "dynamic \n";
+			mu = PythagoreanSolve(a->material.dynamicFriction, b->material.dynamicFriction);
+			frictionImpulse = t * -j * mu;
+		}
+
+		//std::cout << t << " " << frictionImpulse << " " << mu << "\n";
+
+		a->velocity += frictionImpulse * a->massData.invMass * (a->movable || a->collidedWithImmovable);
+		b->velocity -= frictionImpulse * b->massData.invMass * (b->movable || b->collidedWithImmovable);
+	
+	}
+
 	void PositionalCorrection(Manifold m, PhysicsBody* a, PhysicsBody* b)
 	{
 		const float percent = 1.1;
