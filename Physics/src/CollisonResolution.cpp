@@ -51,14 +51,14 @@ namespace lge
 		float j = -(1 + e) * velAlongNormal;
 		j /= a->massData.invMass + b->massData.invMass;
 
-		float jt = -dotVec2(rv, m.normal);
+		float jt = -dotVec2(rv.normalize(), m.normal.normalize());
 		//std::cout << -dotVec2(rv, m.normal) << "\n";
 		jt = jt / (a->massData.invMass + b->massData.invMass);
 
 		float mu = PythagoreanSolve(a->material.staticFriction, b->material.staticFriction);
 		
 		vec2 frictionImpulse;
-		//std::cout << jt << " " << mu << " " << j << " " << j * mu << "\n";
+		std::cout << jt << " " << mu << " " << j << " " << j * mu << "\n";
 
 		if ((jt) < j * mu)
 		{
@@ -116,7 +116,7 @@ namespace lge
 				m.b = *a;
 				m = CircleVsAABB(m);
 				//positionalCorrection(m, a, b);
-				ResolveCollisionStatic(m, b, a);
+				//ResolveCollisionStatic(m, b, a);
 				return m;
 			}
 			case BodyType::Polygon:
@@ -136,7 +136,7 @@ namespace lge
 				m.b = *b;
 				m = CircleVsAABB(m);
 				//positionalCorrection(m, a, b);
-				ResolveCollisionStatic(m, a, b);
+				//ResolveCollisionStatic(m, a, b);
 				return m;
 			}
 			case BodyType::Circle:
