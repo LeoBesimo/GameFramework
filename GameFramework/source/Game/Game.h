@@ -190,11 +190,12 @@ void run()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(5, 0), deltaTime, 1));
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(0, -5), deltaTime, 1));
+			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(0, -50), deltaTime, 1));
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(0, 5), deltaTime, 1));
 
 		//std::cout << player->force << " " << player->velocity << "\n";
+		lge::applyGravity(player, deltaTime, 1);
 		lge::updatePhysicsBody(player, deltaTime, 1);
 		//std::cout << player->force << " " << player->velocity << "\n";
 		//std::cout << "Player: " << player->velocity << " " << deltaTime << "\n";

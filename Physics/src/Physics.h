@@ -6,7 +6,7 @@
 
 namespace lge
 {
-	const double GRAVITY = 20.0;
+	const double GRAVITY = 60.0;
 
 	vec2 getPosition(PhysicsBody* body);
 	void setPosition(PhysicsBody* body, vec2 position);
