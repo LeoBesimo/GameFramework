@@ -45,7 +45,7 @@ namespace lge
 		return true;
 	}
 
-	bool CreatePolygon(PhysicsBody* body, vec2 pos, float radius, float numberPoints, vec2 vel, Material material)
+	bool CreatePolygon(PhysicsBody* body, vec2 pos, float radius, unsigned int numberPoints, vec2 vel, Material material)
 	{
 		if (body == nullptr || numberPoints < 2) return false;
 

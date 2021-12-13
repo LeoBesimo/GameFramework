@@ -2,10 +2,11 @@
 #include <SFML/Graphics.hpp>
 
 #include "Components.h"
-#include "Physics.h"
-#include "CollisionDetection.h"
-#include "BodyCreator.h"
-#include "CollisionResolution.h"
+//#include "Physics.h"
+//#include "CollisionDetection.h"
+//#include "BodyCreator.h"
+//#include "CollisionResolution.h"
+#include "Engine.h"
 
 #include "RenderPhysics.h"
 
@@ -28,10 +29,14 @@ lge::vec2 mousePos;
 bool mousePressed = false;
 bool keyPressed = false;
 
-std::vector<lge::PhysicsBody*> bodies;
-std::vector<lge::PhysicsBody*> walls;
+lge::Engine engine;
+std::vector<lge::uuid> objects;
+lge::uuid walls[4];
 
-lge::PhysicsBody* player = new lge::PhysicsBody();
+//std::vector<lge::PhysicsBody*> bodies;
+//std::vector<lge::PhysicsBody*> walls;
+
+//lge::PhysicsBody* player = new lge::PhysicsBody();
 
 bool create(int screenWidth, int screenHeight) {
 	srand(time(NULL));
@@ -47,7 +52,34 @@ bool create(int screenWidth, int screenHeight) {
 
 	windowSize = lge::vec2(screenWidth, screenHeight);
 
-	lge::CreateAABB(player, lge::vec2(200, 100), lge::vec2(40, 80), lge::vec2(), lge::WOOD);
+
+	lge::Material wall = lge::Material(0, 1, 1500, 1000);
+	walls[0] = engine.AddObjectAABB(lge::vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, wall);
+	walls[1] = engine.AddObjectAABB(lge::vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, wall);
+	walls[2] = engine.AddObjectAABB(lge::vec2(0, 0), lge::vec2(10, screenHeight), { 0,0 }, wall);
+	walls[3] = engine.AddObjectAABB(lge::vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, wall);
+
+	for (auto i : walls)
+	{
+		engine.GetPhysicsBody(i)->color = lge::vec4(255, 0, 255, 255);
+	}
+
+	for (unsigned int i = 0; i < 4; i++) 
+	{
+		engine.GetPhysicsBody(walls[i])->movable = false;
+	}
+
+	for (int i = 0; i < 30; i++)
+	{
+		lge::vec2 pos = lge::signRandom2D() * lge::randomDouble(0, screenWidth);
+		lge::vec2 vel = lge::random2D() * 80;
+		lge::vec2 dim = lge::vec2(lge::randomDouble(25, 40), lge::randomDouble(25, 40));
+		lge::uuid id = engine.AddObjectAABB(pos, dim, vel, lge::PERFECT);
+		engine.GetPhysicsBody(id)->color = lge::vec4(255, 0, 255, 255);
+		objects.push_back(id);
+	}
+
+	/*lge::CreateAABB(player, lge::vec2(200, 100), lge::vec2(40, 80), lge::vec2(), lge::WOOD);
 	player->material.dynamicFriction = 100.2;
 	player->material.staticFriction = 100.4;
 	player->color = lge::vec4(255, 255, 0, 255);
@@ -92,7 +124,7 @@ bool create(int screenWidth, int screenHeight) {
 		walls[i]->movable = false;
 	}
 
-	lge::Material wall = lge::Material(0, 1, 100, 100);
+	lge::Material wall = lge::Material(0, 1, 1500, 1000);
 
 	lge::CreateAABB(walls[0], lge::vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, wall);;
 	lge::CreateAABB(walls[1], lge::vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, wall);
@@ -110,8 +142,9 @@ bool create(int screenWidth, int screenHeight) {
 
 	for (unsigned int i = 0; i < 20; i++)
 	{
+		std::cout << lge::generateUUIDv4() << "\n";
 		//std::cout << randomDouble(-1, 1) << "\n";
-	}
+	}*/
 	return true;
 }
 
@@ -149,7 +182,7 @@ void run()
 
 		if (mousePressed)
 		{
-
+			/*
 			unsigned int size = bodies.size();
 			for (int i = size - 1; i < size - 1 + 5; i++) {
 				//delete bodies[i];
@@ -164,8 +197,8 @@ void run()
 
 				CreateCircle(bodies[i], pos, r, vel, lge::PERFECT);
 				bodies[i]->color = lge::random4D() * 255;//vec4(255, 0, 255, 0);
-			}
-			mousePressed = false;
+			}/**/
+			mousePressed = false;/**/
 		}
 
 		//TODO: Extend physics rendering system
@@ -176,16 +209,16 @@ void run()
 
 		lines.clear();
 
-		for (unsigned int i = 0; i < bodies.size(); i++)
-		{
+		//for (unsigned int i = 0; i < bodies.size(); i++)
+		//{
 			//std::cout << bodies[i]->velocity << " " << bodies[i]->acceleration << "\n";
-		}
+		//}
 
-		player->movable = true;
+		//player->movable = true;
 
 		//lge::vec2 force = lge::forceForDesiredVelocity(*player, lge::vec2(5, 0), deltaTime, 1);
 		//std::cout << force << "\n";
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(-5, 0), deltaTime, 1));
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(5, 0), deltaTime, 1));
@@ -193,13 +226,13 @@ void run()
 			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(0, -50), deltaTime, 1));
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			lge::applyForce(player, lge::forceForDesiredVelocity(*player, lge::vec2(0, 5), deltaTime, 1));
-
+			*/
 		//std::cout << player->force << " " << player->velocity << "\n";
-		lge::applyGravity(player, deltaTime, 1);
-		lge::updatePhysicsBody(player, deltaTime, 1);
+		//lge::applyGravity(player, deltaTime, 1);
+		//lge::updatePhysicsBody(player, deltaTime, 1);
 		//std::cout << player->force << " " << player->velocity << "\n";
 		//std::cout << "Player: " << player->velocity << " " << deltaTime << "\n";
-
+		/*
 		for (unsigned int i = 0; i < walls.size(); i++)
 		{
 			lge::Manifold wp = lge::Collide(player, walls[i]);
@@ -229,7 +262,7 @@ void run()
 					//lge::ResolveCollisionStatic(pm, player, bodies[i]);
 				}*/
 
-				for (unsigned int j = 0; j < walls.size(); j++)
+				/*for (unsigned int j = 0; j < walls.size(); j++)
 				{
 					lge::Manifold m = lge::Collide(bodies[i], walls[j]);
 					if (m.collision)
@@ -240,7 +273,7 @@ void run()
 						//walls[j]->velocity = vec2(0, 0);
 						/*line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
 						line[1].color = sf::Color::Magenta;
-						lines.push_back(line);*/
+						lines.push_back(line);
 						//window->draw(line);
 					}
 				}
@@ -278,13 +311,24 @@ void run()
 			renderPhysicsObject(*window, walls[i]);
 		}
 
-		renderPhysicsObject(*window, player);
+		renderPhysicsObject(*window, player);*/
 
-		for (unsigned int i = 0; i < lines.size(); i++)
+		engine.update(deltaTime);
+
+		for (auto i : walls)
 		{
-			window->draw(lines[i]);
+			lge::PhysicsBody* body = engine.GetPhysicsBody(i);
+
+			renderPhysicsObject(*window, body);
 		}
 
+		for (auto i : objects)
+		{
+			lge::PhysicsBody* body = engine.GetPhysicsBody(i);
+
+			renderPhysicsObject(*window, body);
+		}
+		/*
 		sf::Image img;
 		//img.create(200, 100, sf::Color::White);
 
@@ -311,7 +355,7 @@ void run()
 		s.setPosition(200, 100);
 		//window->draw(s);
 
-		delete[] p;
+		delete[] p;/**/
 
 		window->display();
 

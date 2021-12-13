@@ -83,8 +83,9 @@ namespace lge
 			vec2 acceleration = body->force * body->massData.invMass;
 			body->velocity += acceleration * deltaTime;
 			vec2 tempVel = body->velocity * deltaTime;
-			body->circle.pos += tempVel * tf;
+			body->circle.pos += tempVel * tf * body->movable;
 			body->force.set(0, 0);
+			body->velocity *= body->movable;
 			return true;
 		}
 
@@ -93,9 +94,10 @@ namespace lge
 			vec2 acceleration = body->force * body->massData.invMass;
 			body->velocity += acceleration * deltaTime;
 			vec2 tempVel = body->velocity * deltaTime;
-			body->aabb.min += tempVel * tf;
-			body->aabb.max += tempVel * tf;
+			body->aabb.min += tempVel * tf * body->movable;
+			body->aabb.max += tempVel * tf * body->movable;
 			body->force.set(0, 0);
+			body->velocity *= body->movable;
 			return true;
 		}
 		case BodyType::Polygon:
@@ -103,12 +105,13 @@ namespace lge
 			vec2 acceleration = body->force * body->massData.invMass;
 			body->velocity += acceleration * deltaTime;
 			vec2 tempVel = body->velocity * deltaTime;
-			body->polygon.pos += tempVel * tf;
+			body->polygon.pos += tempVel * tf * body->movable;
 			for (unsigned int i = 0; i < body->polygon.points.size(); i++)
 			{
-				body->polygon.points[i] += tempVel * tf;
+				body->polygon.points[i] += tempVel * tf * body->movable;
 			}
 			body->force.set(0, 0);
+			body->velocity *= body->movable;
 			return true;
 		}
 		}

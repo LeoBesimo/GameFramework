@@ -46,6 +46,9 @@ namespace lge
 		CircleStruct circle;
 		PolygonStruct polygon;
 
+		bool staticCollision = false;
+		bool applyFriction = false;
+
 		bool movable = true;
 		bool collidedWithImmovable = false;
 

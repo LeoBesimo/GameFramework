@@ -14,7 +14,7 @@ inline void renderPhysicsObject(sf::RenderWindow& target, lge::PhysicsBody* body
 		sf::RectangleShape rect;
 		rect.setPosition(body->aabb.min.x, body->aabb.min.y);
 		lge::vec2 dim = body->aabb.max - body->aabb.min;
-		//std::cout << dim << "\n";
+		//std::cout << body->aabb.min << " " << dim << " " <<  lge::vec4(fillColor.r,fillColor.g, fillColor.b, fillColor.a) << "\n";
 		rect.setSize(sf::Vector2f(dim.x, dim.y));
 		rect.setFillColor(fillColor);
 		target.draw(rect);

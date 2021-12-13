@@ -13,12 +13,12 @@ namespace lge
 		float e = fminf(a->material.restitution, b->material.restitution);
 
 		float j = -(1 + e) * velAlongNormal;
-		j /= a->massData.invMass + b->massData.invMass;
+		if(a->massData.invMass + b->massData.invMass != 0) j /= a->massData.invMass + b->massData.invMass;
 
 		vec2 impulse = m.normal * j;
 
-		a->velocity -= impulse * a->massData.invMass * a->movable;
-		b->velocity += impulse * b->massData.invMass * b->movable;
+		a->velocity -= impulse * a->massData.invMass * (a->movable || !a->collidedWithImmovable);
+		b->velocity += impulse * b->massData.invMass * (b->movable || !b->collidedWithImmovable);
 	}
 
 	void ResolveCollisionStatic(Manifold m, PhysicsBody* a, PhysicsBody* b)
@@ -49,16 +49,16 @@ namespace lge
 		float e = fminf(a->material.restitution, b->material.restitution);
 
 		float j = -(1 + e) * velAlongNormal;
-		j /= a->massData.invMass + b->massData.invMass;
+		if (a->massData.invMass + b->massData.invMass != 0) j /= a->massData.invMass + b->massData.invMass;
 
 		float jt = -dotVec2(rv.normalize(), m.normal.normalize());
 		//std::cout << -dotVec2(rv, m.normal) << "\n";
-		jt = jt / (a->massData.invMass + b->massData.invMass);
+		if (a->massData.invMass + b->massData.invMass != 0) j /= a->massData.invMass + b->massData.invMass;  jt = jt / (a->massData.invMass + b->massData.invMass);
 
 		float mu = PythagoreanSolve(a->material.staticFriction, b->material.staticFriction);
 		
 		vec2 frictionImpulse;
-		std::cout << jt << " " << mu << " " << j << " " << j * mu << "\n";
+		//std::cout << jt << " " << mu << " " << j << " " << j * mu << "\n";
 
 		if ((jt) < j * mu)
 		{

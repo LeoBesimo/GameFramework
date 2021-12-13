@@ -1,8 +1,20 @@
 #pragma once
+
+#include <random>
+#include <sstream>
+
 #include "Components.h"
 
 namespace lge
 {
+	typedef std::string uuid;
+
+
+	static std::random_device              rd;
+	static std::mt19937                    gen(rd());
+	static std::uniform_int_distribution<> dis(0, 15);
+	static std::uniform_int_distribution<> dis2(8, 11);
+
 	double PythagoreanSolve(double a, double b);
 	float fastInvSqrt(float n);
 	int hash(int state);
@@ -22,5 +34,7 @@ namespace lge
 	double constrain(double val, double min, double max);
 	vec2 constrainVec2(vec2 a, vec2 min, vec2 max);
 	double dotVec2(vec2 a, vec2 b);
+
+	uuid generateUUIDv4();
 }
 
