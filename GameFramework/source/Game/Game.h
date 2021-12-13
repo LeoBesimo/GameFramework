@@ -48,6 +48,8 @@ bool create(int screenWidth, int screenHeight) {
 	windowSize = lge::vec2(screenWidth, screenHeight);
 
 	lge::CreateAABB(player, lge::vec2(200, 100), lge::vec2(40, 80), lge::vec2(), lge::WOOD);
+	player->material.dynamicFriction = 100.2;
+	player->material.staticFriction = 100.4;
 	player->color = lge::vec4(255, 255, 0, 255);
 
 	for (unsigned int i = 0; i < 10; i++) {
@@ -90,15 +92,17 @@ bool create(int screenWidth, int screenHeight) {
 		walls[i]->movable = false;
 	}
 
-	lge::CreateAABB(walls[0], lge::vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, lge::Material(0,1));
-	lge::CreateAABB(walls[1], lge::vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, lge::Material(0, 1));
-	lge::CreateAABB(walls[2], lge::vec2(0, 0), lge::vec2(10, screenHeight), { 0,0 }, { 0,1 });
-	lge::CreateAABB(walls[3], lge::vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, lge::Material(0, 1));
+	lge::Material wall = lge::Material(0, 1, 100, 100);
+
+	lge::CreateAABB(walls[0], lge::vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, wall);;
+	lge::CreateAABB(walls[1], lge::vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, wall);
+	lge::CreateAABB(walls[2], lge::vec2(0, 0), lge::vec2(10, screenHeight), { 0,0 }, wall);
+	lge::CreateAABB(walls[3], lge::vec2(screenWidth - 10, 0), { 10, (double)screenHeight }, { 0,0 }, wall);
 
 	for (int i = 0; i < walls.size(); i++)
 	{
-		walls[i]->material.dynamicFriction = 0.6;
-		walls[i]->material.staticFriction = 0.9;
+		//walls[i]->material.dynamicFriction = 0.6;
+		//walls[i]->material.staticFriction = 0.9;
 	}
 
 	//bodies.push_back(new PhysicsBody());
@@ -203,6 +207,7 @@ void run()
 				//std::cout << "collide\n";
 				//lge::ApplyFriction(wp, player, walls[i]);
 				lge::ResolveCollisionStatic(wp, player, walls[i]);
+				lge::ApplyFriction(wp, player, walls[i]);
 
 			}
 		}
@@ -230,7 +235,7 @@ void run()
 					{
 						//staticCollisionResolution(m, bodies[i], walls[j]);
 						lge::ResolveCollision(m, bodies[i], walls[j]);
-						//lge::ApplyFriction(m, bodies[i], bodies[j]);
+						lge::ApplyFriction(m, bodies[i], bodies[j]);
 						//walls[j]->velocity = vec2(0, 0);
 						/*line[1].position = sf::Vector2f(bodyPos.x - m.normal.x * 5, bodyPos.y - m.normal.y * 5);
 						line[1].color = sf::Color::Magenta;
@@ -247,7 +252,7 @@ void run()
 						if (m.collision)
 						{
 							lge::ResolveCollision(m, bodies[i], bodies[j]);
-							lge::ApplyFriction(m, bodies[i], bodies[j]);
+							//lge::ApplyFriction(m, bodies[i], bodies[j]);
 							//staticCollisionResolution(m, bodies[i], bodies[j]);
 						
 
