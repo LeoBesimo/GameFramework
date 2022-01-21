@@ -10,20 +10,21 @@
 
 namespace lge
 {
-	class Engine {
+	class PhysicsEngine {
 	
 	private:
 		vec2 GRAVITY;
 
 		std::unordered_map<uuid, PhysicsBody*> objects;
 		std::vector<uuid> keys;
+		std::vector<PhysicsBody*> bodies;
 
-		int TimeSteps = 2;
+		int TimeSteps = 1;
 
 	public:
 
-		Engine();
-		~Engine();
+		PhysicsEngine();
+		~PhysicsEngine();
 		
 		vec2 GetGravity();
 		void SetGravity(const vec2 grav);

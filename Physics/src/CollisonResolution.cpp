@@ -13,12 +13,21 @@ namespace lge
 		float e = fminf(a->material.restitution, b->material.restitution);
 
 		float j = -(1 + e) * velAlongNormal;
-		if(a->massData.invMass + b->massData.invMass != 0) j /= a->massData.invMass + b->massData.invMass;
+		if (true) //(a->massData.invMass + b->massData.invMass != 0)
+		{
+			//std::cout << "true ";
+			j /= a->massData.invMass + b->massData.invMass;
+		}
+		//std::cout << a->massData.invMass + b->massData.invMass << " " << a->type << " " << b->type << " ";
 
 		vec2 impulse = m.normal * j;
+		//std::cout << "Impulse " << impulse << " ";
+		a->velocity -= impulse * a->massData.invMass;
+		b->velocity += impulse * b->massData.invMass;
 
-		a->velocity -= impulse * a->massData.invMass * (a->movable || !a->collidedWithImmovable);
-		b->velocity += impulse * b->massData.invMass * (b->movable || !b->collidedWithImmovable);
+		//std::cout << "Applied impulse" << -impulse * a->massData.invMass << " ";
+
+		//std::cout << a->velocity << " " << b->velocity << "\n";
 	}
 
 	void ResolveCollisionStatic(Manifold m, PhysicsBody* a, PhysicsBody* b)
@@ -28,8 +37,8 @@ namespace lge
 
 		vec2 aPos = getPosition(a);
 		vec2 bPos = getPosition(b);
-		aPos -= m.normal * (m.penetration / 2) * (a->movable || !a->collidedWithImmovable);
-		bPos += m.normal * (m.penetration / 2) * (b->movable || !a->collidedWithImmovable);
+		aPos -= m.normal * (m.penetration / 2) * 1.1 * (a->movable || !a->collidedWithImmovable);
+		bPos += m.normal * (m.penetration / 2) * 1.1 * (b->movable || !a->collidedWithImmovable);
 		setPosition(a, aPos);
 		setPosition(b, bPos);
 	}
@@ -53,7 +62,7 @@ namespace lge
 
 		float jt = -dotVec2(rv.normalize(), m.normal.normalize());
 		//std::cout << -dotVec2(rv, m.normal) << "\n";
-		if (a->massData.invMass + b->massData.invMass != 0) j /= a->massData.invMass + b->massData.invMass;  jt = jt / (a->massData.invMass + b->massData.invMass);
+		if (a->massData.invMass + b->massData.invMass != 0) jt = jt / (a->massData.invMass + b->massData.invMass);
 
 		float mu = PythagoreanSolve(a->material.staticFriction, b->material.staticFriction);
 		

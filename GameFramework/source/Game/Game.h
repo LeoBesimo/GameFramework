@@ -69,13 +69,24 @@ bool create(int screenWidth, int screenHeight) {
 		engine.GetPhysicsBody(walls[i])->movable = false;
 	}
 
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		lge::vec2 pos = lge::signRandom2D() * lge::randomDouble(0, screenWidth);
 		lge::vec2 vel = lge::random2D() * 80;
 		lge::vec2 dim = lge::vec2(lge::randomDouble(25, 40), lge::randomDouble(25, 40));
 		lge::uuid id = engine.AddObjectAABB(pos, dim, vel, lge::PERFECT);
 		engine.GetPhysicsBody(id)->color = lge::vec4(255, 0, 255, 255);
+		objects.push_back(id);
+	}
+
+	for (int i = 0; i < 30; i++)
+	{
+		lge::vec2 pos = lge::signRandom2D() * lge::randomDouble(0, screenWidth); //lge::vec2(200, 100); //
+		lge::vec2 vel = lge::random2D() * 80; //lge::vec2(-60, 0);//
+		//lge::vec2 dim = lge::vec2(lge::randomDouble(25, 40), lge::randomDouble(25, 40));
+		double r = lge::randomDouble(5, 10);
+		lge::uuid id = engine.AddObjectCircle(pos, r, vel, lge::PERFECT);
+		engine.GetPhysicsBody(id)->color = lge::vec4(255, 255, 0, 255);
 		objects.push_back(id);
 	}
 
@@ -173,9 +184,7 @@ void run()
 			if (event.type == sf::Event::MouseButtonReleased)
 				mousePressed = false;
 			if (event.type == sf::Event::KeyPressed)
-			{
 				keyPressed = true;
-			}
 			if (event.type == sf::Event::KeyReleased)
 				keyPressed = false;
 		}
@@ -313,8 +322,28 @@ void run()
 
 		renderPhysicsObject(*window, player);*/
 
-		engine.update(deltaTime);
+		if(!keyPressed) engine.update(deltaTime);
 
+		/*if (!keyPressed)
+		{
+		for (auto j : objects)
+		{
+			lge::PhysicsBody* object = engine.GetPhysicsBody(j);
+			lge::updatePhysicsBody(object, deltaTime, 1);
+			//std::cout << lge::getPosition(object);
+
+			for (auto i : walls)
+			{
+				lge::PhysicsBody* wall = engine.GetPhysicsBody(i);
+				lge::Manifold m = lge::Collide(object, wall);
+				if (m.collision)
+				{
+					std::cout << m.normal << " " << m.penetration << "\n";
+					lge::ResolveCollision(m, object, wall);
+				}
+			}
+		}
+		}*/
 		for (auto i : walls)
 		{
 			lge::PhysicsBody* body = engine.GetPhysicsBody(i);

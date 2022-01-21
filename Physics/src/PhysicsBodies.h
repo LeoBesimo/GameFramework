@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Components.h"
+#include "Utilities.h"
 #include "Materials.h"
 #include <vector>
 
@@ -45,6 +46,8 @@ namespace lge
 		AABBStruct aabb;
 		CircleStruct circle;
 		PolygonStruct polygon;
+
+		uuid id;
 
 		bool staticCollision = false;
 		bool applyFriction = false;
