@@ -3,28 +3,7 @@
 
 namespace lge
 {
-	double PythagoreanSolve(double a, double b)
-	{
-		return sqrt(a * a + b * b);
-	}
-
-
-	float fastInvSqrt(float n)
-	{
-
-		const float threehalfs = 1.5F;
-		float y = n;
-
-		long i = *(long*)&y;
-
-		i = 0x5f3759df - (i >> 1);
-		y = *(float*)&i;
-
-		y = y * (threehalfs - ((n * 0.5F) * y * y));
-		y = y * (threehalfs - ((n * 0.5F) * y * y));
-
-		return y;
-	}
+	
 
 	int hash(int state)
 	{
@@ -116,11 +95,6 @@ namespace lge
 		vec.x = constrain(vec.x, min.x, max.x);
 		vec.y = constrain(vec.y, min.y, max.y);
 		return vec;
-	}
-
-	double dotVec2(vec2 a, vec2 b)
-	{
-		return a.x * b.x + a.y * b.y;
 	}
 
 	std::string generateUUIDv4()

@@ -140,9 +140,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Components.h" />
+    <ClInclude Include="src\lgeMath.h" />
+    <ClInclude Include="src\mat2.h" />
     <ClInclude Include="src\Utilities.h" />
+    <ClInclude Include="src\vec2.h" />
+    <ClInclude Include="src\vec3.h" />
+    <ClInclude Include="src\vec4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\lgeMath.cpp" />
     <ClCompile Include="src\Utilities.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

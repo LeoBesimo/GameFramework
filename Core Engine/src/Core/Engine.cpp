@@ -2,8 +2,4 @@
 
 namespace lge
 {
-	class Engine
-	{
-
-	};
 }

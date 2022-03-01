@@ -15,8 +15,7 @@ namespace lge
 	static std::uniform_int_distribution<> dis(0, 15);
 	static std::uniform_int_distribution<> dis2(8, 11);
 
-	double PythagoreanSolve(double a, double b);
-	float fastInvSqrt(float n);
+	
 	int hash(int state);
 	double randomDouble(double min, double man);
 	vec2 random2D();
@@ -33,7 +32,7 @@ namespace lge
 	double map(double val, double oldMin, double oldMax, double newMin, double newMax);
 	double constrain(double val, double min, double max);
 	vec2 constrainVec2(vec2 a, vec2 min, vec2 max);
-	double dotVec2(vec2 a, vec2 b);
+	
 
 	uuid generateUUIDv4();
 }

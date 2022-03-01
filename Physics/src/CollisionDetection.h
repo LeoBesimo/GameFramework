@@ -2,6 +2,7 @@
 
 #include "Components.h"
 #include "Utilities.h"
+#include "lgeMath.h"
 
 #include "PhysicsBodies.h"
 #include "Physics.h"
