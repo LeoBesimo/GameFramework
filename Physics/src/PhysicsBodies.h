@@ -36,7 +36,8 @@ namespace lge
 	typedef struct _Polygon
 	{
 		vec2 pos = vec2(0, 0);
-		std::vector<vec2> points;
+		std::vector<vec2> originalPoints;
+		std::vector<lge::vec2> transformedPoints;
 
 	} PolygonStruct;
 
@@ -55,8 +56,14 @@ namespace lge
 		bool movable = true;
 		bool collidedWithImmovable = false;
 
+
 		vec2 force;
 		vec2 velocity;
+		vec2 acceleration;
+
+		double orientation;
+		double angularVelocity;
+		double torque;
 
 		MassData massData;
 		Material material;

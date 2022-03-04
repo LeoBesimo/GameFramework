@@ -132,13 +132,15 @@ void run()
 
 		lines.clear();
 
-		double angle = lge::map(mousePos.x,0,windowSize.x,0,lge::TWO_PI);
+		double angle = lge::map(mousePos.x,0,windowSize.x,0, lge::TWO_PI);
 
 		lge::mat2 screen(1000, 0, 0, 800);
 
 		lge::mat2 scaler(150, 0, 0, 150);
 
 		lge::mat2 rotation(cos(angle), -sin(angle), sin(angle), cos(angle));
+		//rotation = lge::invMat2(rotation);
+		//rotation = lge::invMat2(rotation);
 		lge::vec2 pos(-0.25, -0.25);
 		lge::vec2 pos1(0.25, -0.25);
 		lge::vec2 pos2(0.25, 0.25);
@@ -148,7 +150,7 @@ void run()
 		
 		lge::mat2 transform = scaler * rotation;
 
-		lge::vec2 displacement = mousePos;
+		lge::vec2 displacement = windowSize/2;
 
 		//std::cout << transform << "\n";
 
@@ -192,7 +194,7 @@ void run()
 
 		deltaTime = deltaClock.restart().asSeconds();
 		fps = 1 / deltaTime;
-		std::cout << fps << " " << deltaTime<< "\n";
+		//std::cout << fps << " " << deltaTime<< "\n";
 	}
 }
 

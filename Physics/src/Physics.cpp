@@ -106,9 +106,9 @@ namespace lge
 			body->velocity += acceleration * deltaTime;
 			vec2 tempVel = body->velocity * deltaTime;
 			body->polygon.pos += tempVel * tf * body->movable;
-			for (unsigned int i = 0; i < body->polygon.points.size(); i++)
+			for (unsigned int i = 0; i < body->polygon.originalPoints.size(); i++)
 			{
-				body->polygon.points[i] += tempVel * tf * body->movable;
+				body->polygon.originalPoints[i] += tempVel * tf * body->movable;
 			}
 			body->force.set(0, 0);
 			body->velocity *= body->movable;
