@@ -145,6 +145,7 @@ void run()
 		lge::vec2 pos1(0.25, -0.25);
 		lge::vec2 pos2(0.25, 0.25);
 		lge::vec2 pos3(-0.25, 0.25);
+		lge::vec2 pos4(0, 0);
 
 		//lge::mat2 transform = screen * lge::invMat2(screen * 0.5) *rotation * (screen * 0.5);
 		
@@ -154,6 +155,21 @@ void run()
 
 		//std::cout << transform << "\n";
 
+		
+
+		std::vector<lge::vec2> posList;
+
+		posList.push_back(pos);
+		posList.push_back(pos1);
+		posList.push_back(pos2);
+		posList.push_back(pos4);
+		posList.push_back(pos3);
+
+		posList = lge::applyMat2ToVec2List(posList, transform);
+		posList = lge::addVec2ToVec2List(posList, displacement);
+		/*
+		* 
+		
 		lge::vec2 scaledPos = transform * pos + displacement;
 		lge::vec2 scaledPos1 = transform * pos1 + displacement;
 		lge::vec2 scaledPos2 = transform * pos2 + displacement;
@@ -170,9 +186,11 @@ void run()
 		line[5].position = sf::Vector2f(scaledPos3.x, scaledPos3.y);
 		line[6].position = sf::Vector2f(scaledPos3.x, scaledPos3.y);
 		line[7].position = sf::Vector2f(scaledPos.x, scaledPos.y);
-
 		window->draw(line,8 ,sf::Lines);
-
+		
+			*/
+	
+		renderVec2List(*window, posList);
 
 		/*if(!keyPressed) engine.update(deltaTime);
 

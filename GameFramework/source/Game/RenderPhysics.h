@@ -43,10 +43,10 @@ inline void renderPhysicsObject(sf::RenderWindow& target, lge::PhysicsBody* body
 	case lge::BodyType::Polygon:
 	{
 		sf::ConvexShape shape;
-		shape.setPointCount(body->polygon.points.size());
+		shape.setPointCount(body->polygon.transformedPoints.size());
 
-		for (unsigned int i = 0; i < body->polygon.points.size(); i++) {
-			shape.setPoint(i, sf::Vector2f(body->polygon.points[i].x, body->polygon.points[i].y));
+		for (unsigned int i = 0; i < body->polygon.transformedPoints.size(); i++) {
+			shape.setPoint(i, sf::Vector2f(body->polygon.transformedPoints[i].x, body->polygon.transformedPoints[i].y));
 		}
 
 		shape.setFillColor(fillColor);
@@ -57,6 +57,24 @@ inline void renderPhysicsObject(sf::RenderWindow& target, lge::PhysicsBody* body
 	case lge::BodyType::Null:
 		break;
 	}
+}
+
+inline void renderVec2List(sf::RenderWindow& target, std::vector<lge::vec2> vec2List)
+{
+	sf::VertexArray lines(sf::Lines, vec2List.size() * 2);
+	unsigned int j = 0;
+	for (unsigned int i = 0; i < vec2List.size() * 2; i+=2)
+	{
+		lines[i].position = sf::Vector2f(vec2List[j % vec2List.size()].x, vec2List[j % vec2List.size()].y);
+		lines[i+1] = sf::Vector2f(vec2List[(j + 1) % vec2List.size()].x, vec2List[(j + 1) % vec2List.size()].y);
+		j++;
+	}
+
+	for (unsigned int i = 0; i < lines.getVertexCount(); i++) lines[i].color = sf::Color::Black;
+
+	//std::cout << lines.getVertexCount() << "\n";
+
+	target.draw(lines);
 }
 
 inline void renderPhysicsObject(sf::RenderWindow& target, lge::PhysicsBody* body)

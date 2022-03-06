@@ -124,4 +124,44 @@ namespace lge
 		};
 		return ss.str();
 	}
+	std::vector<vec2> applyMat2ToVec2List(std::vector<vec2> &vectors, mat2 matrix)
+	{
+		for (unsigned int i = 0; i < vectors.size(); i++)
+		{
+			vectors[i] = (matrix * vectors[i]);
+		}
+		return vectors;
+	}
+	std::vector<vec2> addVec2ToVec2List(std::vector<vec2>& vectors, vec2 toAdd)
+	{
+		for (unsigned int i = 0; i < vectors.size(); i++)
+		{
+			vectors[i] += toAdd;
+		}
+		return vectors;
+	}
+	std::vector<vec2> multVec2ToVec2List(std::vector<vec2>& vectors, vec2 toMult)
+	{
+		for (unsigned int i = 0; i < vectors.size(); i++)
+		{
+			vectors[i] *= toMult;
+		}
+		return vectors;
+	}
+	std::vector<vec2> subVec2ToVec2List(std::vector<vec2>& vectors, vec2 toSub)
+	{
+		for (unsigned int i = 0; i < vectors.size(); i++)
+		{
+			vectors[i] -= toSub;
+		}
+		return vectors;
+	}
+	std::vector<vec2> divVec2ToVec2List(std::vector<vec2>& vectors, vec2 toDiv)
+	{
+		for (unsigned int i = 0; i < vectors.size(); i++)
+		{
+			vectors[i] /= toDiv;
+		}
+		return vectors;
+	}
 }
