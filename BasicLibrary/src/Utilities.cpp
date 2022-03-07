@@ -97,6 +97,13 @@ namespace lge
 		return vec;
 	}
 
+	vec2 mapVec2(vec2 a, vec2 oldMin, vec2 oldMax, vec2 newMin, vec2 newMax)
+	{
+		double x = map(a.x, oldMin.x, oldMax.x, newMin.x, newMax.x);
+		double y = map(a.y, oldMin.y, oldMax.y, newMin.y, newMax.y);
+		return vec2(x,y);
+	}
+
 	std::string generateUUIDv4()
 	{
 		std::stringstream ss;
@@ -161,6 +168,14 @@ namespace lge
 		for (unsigned int i = 0; i < vectors.size(); i++)
 		{
 			vectors[i] /= toDiv;
+		}
+		return vectors;
+	}
+	std::vector<vec2> mapVec2List(std::vector<vec2>& vectors, vec2 oldMin, vec2 oldMax, vec2 newMin, vec2 newMax)
+	{
+		for (unsigned int i = 0; i < vectors.size(); i++)
+		{
+			vectors[i] = mapVec2(vectors[i], oldMin, oldMax, newMin, newMax);
 		}
 		return vectors;
 	}

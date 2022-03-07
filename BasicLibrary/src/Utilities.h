@@ -32,6 +32,7 @@ namespace lge
 	double map(double val, double oldMin, double oldMax, double newMin, double newMax);
 	double constrain(double val, double min, double max);
 	vec2 constrainVec2(vec2 a, vec2 min, vec2 max);
+	vec2 mapVec2(vec2 a, vec2 oldMin, vec2 oldMax, vec2 newMin, vec2 newMax);
 
 	uuid generateUUIDv4();
 
@@ -40,5 +41,6 @@ namespace lge
 	std::vector<vec2> multVec2ToVec2List(std::vector<vec2>& vectors, vec2 toMult);
 	std::vector<vec2> subVec2ToVec2List(std::vector<vec2>& vectors, vec2 toSub);
 	std::vector<vec2> divVec2ToVec2List(std::vector<vec2>& vectors, vec2 toDiv);
+	std::vector<vec2> mapVec2List(std::vector<vec2>& vectors, vec2 oldMin, vec2 oldMax, vec2 newMin, vec2 newMax);
 }
 

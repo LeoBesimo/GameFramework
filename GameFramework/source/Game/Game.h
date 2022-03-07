@@ -30,6 +30,11 @@ lge::vec2 mousePos;
 bool mousePressed = false;
 bool keyPressed = false;
 
+bool editMode = false;
+
+std::vector<lge::vec2> posList;
+std::vector<lge::vec2> customShape;
+
 //lge::PhysicsEngine engine;
 //std::vector<lge::uuid> objects;
 //lge::uuid walls[4];
@@ -86,12 +91,27 @@ bool create(int screenWidth, int screenHeight) {
 	}
 	*/
 
+	lge::vec2 pos(-0.25, -0.25);
+	lge::vec2 pos1(0.25, -0.25);
+	lge::vec2 pos2(0.25, 0.25);
+	lge::vec2 pos3(-0.25, 0.25);
+	lge::vec2 pos4(0, 0);
+
+
+	posList.push_back(pos);
+	posList.push_back(pos1);
+	posList.push_back(pos2);
+	posList.push_back(pos4);
+	posList.push_back(pos3);
+
 	return true;
 }
 
 std::vector<sf::VertexArray> lines;
 
 int timeSteps = 2;
+
+
 
 void run()
 {
@@ -119,10 +139,7 @@ void run()
 				keyPressed = false;
 		}
 
-		if (mousePressed)
-		{
-			mousePressed = false;
-		}
+		
 
 		//TODO: Extend physics rendering system
 
@@ -131,8 +148,8 @@ void run()
 		window->clear(sf::Color::White);
 
 		lines.clear();
-
-		double angle = lge::map(mousePos.x,0,windowSize.x,0, lge::TWO_PI);
+		double angle = 0;
+		if(!editMode) angle = lge::map(mousePos.x, 0, windowSize.x, 0, lge::TWO_PI);
 
 		lge::mat2 screen(1000, 0, 0, 800);
 
@@ -141,11 +158,7 @@ void run()
 		lge::mat2 rotation(cos(angle), -sin(angle), sin(angle), cos(angle));
 		//rotation = lge::invMat2(rotation);
 		//rotation = lge::invMat2(rotation);
-		lge::vec2 pos(-0.25, -0.25);
-		lge::vec2 pos1(0.25, -0.25);
-		lge::vec2 pos2(0.25, 0.25);
-		lge::vec2 pos3(-0.25, 0.25);
-		lge::vec2 pos4(0, 0);
+		
 
 		//lge::mat2 transform = screen * lge::invMat2(screen * 0.5) *rotation * (screen * 0.5);
 		
@@ -155,18 +168,37 @@ void run()
 
 		//std::cout << transform << "\n";
 
-		
+		if (mousePressed)
+		{
+			//lge::vec2 newPos = mapVec2(mousePos, lge::vec2(), windowSize, lge::vec2(-1, -1), lge::vec2(1, 1));
+			//posList.push_back(newPos);
+			
+			if(editMode) customShape.push_back(mousePos);
+			
+			//mousePressed = false;
+		}
 
-		std::vector<lge::vec2> posList;
+		if (keyPressed)
+		{
+			if (editMode)
+			{
+				posList = lge::mapVec2List(customShape, lge::vec2(), windowSize, lge::vec2(-1, -1), lge::vec2(1, 1));
+				editMode = false;
+			}
 
-		posList.push_back(pos);
-		posList.push_back(pos1);
-		posList.push_back(pos2);
-		posList.push_back(pos4);
-		posList.push_back(pos3);
+			else
+			{
+				customShape.clear();
+				editMode = true;
+			}
+			keyPressed = false;
+		}
 
-		posList = lge::applyMat2ToVec2List(posList, transform);
-		posList = lge::addVec2ToVec2List(posList, displacement);
+		if (!editMode) displacement = mousePos;
+
+		std::vector<lge::vec2> transformed = posList;
+		transformed = lge::applyMat2ToVec2List(transformed, transform);
+		transformed = lge::addVec2ToVec2List(transformed, displacement);
 		/*
 		* 
 		
@@ -190,7 +222,9 @@ void run()
 		
 			*/
 	
-		renderVec2List(*window, posList);
+
+		if(editMode) renderVec2List(*window, customShape);
+		renderVec2List(*window, transformed);
 
 		/*if(!keyPressed) engine.update(deltaTime);
 
