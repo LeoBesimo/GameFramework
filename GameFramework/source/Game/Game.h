@@ -35,9 +35,9 @@ bool editMode = false;
 std::vector<lge::vec2> posList;
 std::vector<lge::vec2> customShape;
 
-//lge::PhysicsEngine engine;
-//std::vector<lge::uuid> objects;
-//lge::uuid walls[4];
+lge::PhysicsEngine engine;
+std::vector<lge::uuid> objects;
+lge::uuid walls[4];
 
 bool create(int screenWidth, int screenHeight) {
 	srand(time(NULL));
@@ -53,7 +53,7 @@ bool create(int screenWidth, int screenHeight) {
 
 	windowSize = lge::vec2(screenWidth, screenHeight);
 
-	/*
+	
 	lge::Material wall = lge::Material(0, 1, 1500, 1000);
 	walls[0] = engine.AddObjectAABB(lge::vec2(0, 0), { (double)screenWidth,10 }, { 0,0 }, wall);
 	walls[1] = engine.AddObjectAABB(lge::vec2(0, screenHeight - 10), { (double)screenWidth,10 }, { 0,0 }, wall);
@@ -89,7 +89,7 @@ bool create(int screenWidth, int screenHeight) {
 		engine.GetPhysicsBody(id)->color = lge::vec4(255, 255, 0, 255);
 		objects.push_back(id);
 	}
-	*/
+	
 
 	lge::vec2 pos(-0.25, -0.25);
 	lge::vec2 pos1(0.25, -0.25);
@@ -149,7 +149,7 @@ void run()
 
 		lines.clear();
 		double angle = 0;
-		if(!editMode) angle = lge::map(mousePos.x, 0, windowSize.x, 0, lge::TWO_PI);
+		if(!editMode) angle = lge::map(mousePos.x, 0, windowSize.x, 0, 3*lge::TWO_PI);
 
 		lge::mat2 screen(1000, 0, 0, 800);
 
@@ -226,7 +226,8 @@ void run()
 		if(editMode) renderVec2List(*window, customShape);
 		renderVec2List(*window, transformed);
 
-		/*if(!keyPressed) engine.update(deltaTime);
+	/*
+		if(!keyPressed) engine.update(deltaTime);
 
 		for (auto i : walls)
 		{
@@ -240,8 +241,8 @@ void run()
 			lge::PhysicsBody* body = engine.GetPhysicsBody(i);
 
 			renderPhysicsObject(*window, body);
-		}
-		*/
+		}*/
+		
 		window->display();
 
 		deltaTime = deltaClock.restart().asSeconds();
