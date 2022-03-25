@@ -42,5 +42,6 @@ namespace lge
 	std::vector<vec2> subVec2ToVec2List(std::vector<vec2>& vectors, vec2 toSub);
 	std::vector<vec2> divVec2ToVec2List(std::vector<vec2>& vectors, vec2 toDiv);
 	std::vector<vec2> mapVec2List(std::vector<vec2>& vectors, vec2 oldMin, vec2 oldMax, vec2 newMin, vec2 newMax);
+	vec2 avgVec2List(std::vector<vec2>& vectors);
 }
 

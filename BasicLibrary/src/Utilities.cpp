@@ -179,4 +179,11 @@ namespace lge
 		}
 		return vectors;
 	}
+	vec2 avgVec2List(std::vector<vec2>& vectors)
+	{
+		vec2 sum;
+		for (unsigned int i = 0; i < vectors.size(); i++)
+			sum += vectors[i];
+		return sum / vectors.size();
+	}
 }

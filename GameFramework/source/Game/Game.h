@@ -19,7 +19,7 @@ lge::vec2 screenScaling;
 lge::vec2 windowSize;
 
 sf::CircleShape shape(100.f);
-sf::CircleShape circle(100.f);
+sf::CircleShape circle(10.f);
 
 sf::Clock deltaClock;
 float deltaTime;
@@ -221,10 +221,14 @@ void run()
 		window->draw(line,8 ,sf::Lines);
 		
 			*/
-	
+		
 
 		if(editMode) renderVec2List(*window, customShape);
+		lge::vec2 circlePos = editMode ? windowSize/2 : lge::avgVec2List(transformed);
+		circlePos -= lge::vec2(10,10);
+		circle.setPosition(circlePos.x, circlePos.y);
 		renderVec2List(*window, transformed);
+		window->draw(circle);
 
 	/*
 		if(!keyPressed) engine.update(deltaTime);
